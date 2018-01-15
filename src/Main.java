@@ -1,4 +1,4 @@
-package adom_tsp;
+package src;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;

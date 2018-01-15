@@ -1,4 +1,4 @@
-package adom_tsp;
+package src;
 
 public class Data {
 
