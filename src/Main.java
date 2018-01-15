@@ -83,14 +83,14 @@ public class Main {
 		if(TAILLLE==0) {
 			TAILLLE=matrix.length;
 		}
-		
+
 		for (int i = 0; i < TAILLLE; i++) {
 			for (int j = 0; j < TAILLLE; j++) {
 				System.out.print(matrix[i][j] + " | ");
 			}
 			System.out.println();
 		}
-		
+
 	}
 
 	private static int evaluateRandomSolution(MatrixData [][] matrix,ArrayList<Integer> cities) {
@@ -172,15 +172,72 @@ public class Main {
 		}
 	}
 
-	private static int evaluateHeuristicSolutionTaille(MatrixData [][] matrix,int x, int y, int TAILLE){
+	private static int evaluateHeuristicSolutionTaille(MatrixData [][] matrix,int x, int y,int alter, int TAILLE){
 		int somme = 0;
-		int newX=0;
-		int newY=0;
+		int newX=0;//ligne
+		int newY=0;//colonne
 		boolean allCitiesChecked = false;
 		double min = 10000000;
+
+		//visualizeMatrix(matrix,TAILLE);
+
+		if(alter==0 || alter ==1) {
+			//vue sur la ligne ciblee
+			//System.out.println("Ciblage sur la ligne");
+			for (int i = 0; i < TAILLE; i++) {
+				if(matrix[x][i]!=null) {
+					if(matrix[x][i].getDistance()<min && !matrix[x][i].isAncestor()) {
+						//System.out.println(matrix[x][i]);
+						min = matrix[x][i].getDistance();
+						newX=x;
+						newY=i;
+						alter=3;
+					}
+				}
+			}
+		}
 		
-		visualizeMatrix(matrix,TAILLE);
+
+		if(alter==0 || alter ==2) {
+			//vue sur la colonne ciblee
+			//System.out.println("Ciblage sur la colonne");
+			for (int i = 0; i < TAILLE; i++) {
+				if(matrix[i][y]!=null) {
+					if(matrix[i][y].getDistance()<min && !matrix[i][y].isAncestor()) {
+						//System.out.println(matrix[i][y]);
+						min = matrix[i][y].getDistance();
+						newX=i;
+						newY=y;
+						alter=1;
+					}
+				}
+			}
+		}
+		//ligne
+		if(alter==3) {
+			alter=2;
+			for (int i = 0; i < TAILLE; i++) {
+				if(matrix[newX][i]!=null)
+					matrix[newX][i].setAncestor(true);
+			}
+		}
+		//colonne
+		if(alter==1) {
+			for (int i = 0; i < TAILLE; i++) {
+				if(matrix[i][newY]!=null)
+					matrix[i][newY].setAncestor(true);
+			}
+		}
 		
+		System.out.println("min final du ciblage : " + min + " ("+newX+";"+newY+") - alter : " + alter);
+
+		somme = (int) (somme + min);
+
+		return somme + evaluateHeuristicSolutionTaille(matrix, newX, newY, alter, TAILLE);
+
+
+		/*
+
 		// partie verticale de la croix
 		for (int i = 0; i < TAILLE; i++) {
 			if(matrix[i][y]!=null) {
@@ -218,8 +275,10 @@ public class Main {
 		} else {
 			return somme;
 		}
+
+		 */
 	}
-	
+
 	public static void main(String [] args) {
 		ArrayList<Data> datas_kroA100 = parseFile("kroA100.tsp");
 		MatrixData [][] matrixARandom = generateMatrix(datas_kroA100,"random");
@@ -229,7 +288,7 @@ public class Main {
 		// Meilleure solution connue pour kroA100 : 21282
 		System.out.println("Cout de la solution par random : "+ evaluateRandomSolution(matrixARandom, cities));
 		//visualizeMatrix(matrixAHeuristic);
-		System.out.println("Cout de la solution heuristique : "+ evaluateHeuristicSolutionTaille(matrixAHeuristic,0,0,10));
+		System.out.println("Cout de la solution heuristique : "+ evaluateHeuristicSolutionTaille(matrixAHeuristic,1,1,0,matrixAHeuristic.length));
 	}
 
 }

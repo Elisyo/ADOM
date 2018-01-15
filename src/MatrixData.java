@@ -6,7 +6,7 @@ public class MatrixData {
 	private boolean ancestor;
 	
 	public MatrixData() {
-		
+		this.distance=0;
 	}
 	
 	public MatrixData(double distance) {
