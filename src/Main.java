@@ -65,53 +65,17 @@ public class Main {
 		return resultat;
 	}
 
+	/**
+	 * Fonction permettant d'avoir un apercu terminal de la matrice
+	 * @param MatrixInHashMap
+	 */
 	private static void visualizeMatrixInHashMap(HashMap<Integer, ArrayList<Integer>> MatrixInHashMap) {
 		for (int i = 0; i < MatrixInHashMap.size(); i++) {
 			System.out.println("ville "+ i + " : " + MatrixInHashMap.get(i));
 		}
 	}
 	
-	/**
-	 * Fonction permettant d'avoir un apercu terminal de la matrice
-	 * @param matrix
-	 */
-	private static void visualizeMatrix(MatrixData [][] matrix, int TAILLLE) {
-		if(TAILLLE==0) {
-			TAILLLE=matrix.length;
-		}
-
-		for (int i = 0; i < TAILLLE; i++) {
-			for (int j = 0; j < TAILLLE; j++) {
-				System.out.print(matrix[i][j] + " | ");
-			}
-			System.out.println();
-		}
-
-	}
-
-	/**
-	 * inspiration : http://www.journaldunet.com/web-tech/developpement/1202399-comment-generer-un-nombre-aleatoire-random-en-java-compris-entre-deux-chiffres/
-	 * @param x
-	 * @return
-	 */
-	private static ArrayList<Integer> randomCities(int x){
-		ArrayList<Integer> cities = new ArrayList<Integer>();
-		int r=0;
-		ArrayList<Integer> availableCities = new ArrayList<Integer>();
-		for (int i = 1; i < x+1; i++) {
-			availableCities.add(i);
-		}
-		while(cities.size()!=x) {
-			r = (int) (Math.random() * ( availableCities.size() - 1));
-			if(!cities.contains(availableCities.get(r))) {
-				cities.add(availableCities.get(r));
-				availableCities.remove(r);
-			}
-		}
-		return cities;
-	}
-
-	private static int evaluateHeuristicSolutionWithHashMap(HashMap<Integer, ArrayList<Integer>> matrixInHashMap, int starter) {
+	private static ArrayList<Integer> evaluateHeuristicSolutionWithHashMap(HashMap<Integer, ArrayList<Integer>> matrixInHashMap, int starter) {
 		ArrayList<Integer> availableCities = new ArrayList<Integer>();
 		ArrayList<Integer> finalListCities = new ArrayList<Integer>();
 		
@@ -154,38 +118,75 @@ public class Main {
 			System.out.println(somme);
 			System.out.println(starter);*/	
 		}
-		//ajout du dernier couple pour boucler la boucle
-		ArrayList<Integer> lastCities = matrixInHashMap.get(finalListCities.get(finalListCities.size()-1));
-		somme = somme + lastCities.get(finalListCities.get(0));
-		
-		return somme;
+		return finalListCities;
 	}
 	
 	private static int bestHeuristic(HashMap<Integer, ArrayList<Integer>> matrixInHashMap) {
 		ArrayList<Integer> solutions = new ArrayList<Integer>();
 		for (int i = 0; i < matrixInHashMap.size(); i++) {
-			solutions.add(evaluateHeuristicSolutionWithHashMap(matrixInHashMap,i));
+			solutions.add(evaluateDistances(evaluateHeuristicSolutionWithHashMap(matrixInHashMap,i),matrixInHashMap));
 		}
 		int min = 1000000000;
 		for (int i = 0; i < solutions.size(); i++) {
 			if(solutions.get(i)<min) {
 				min = solutions.get(i);
 			}
-		}
-		System.out.println(solutions);
-		
+		}		
 		return min;
+	}
+	
+	/**
+	 * Echange de place 2 items de la liste
+	 * @param listCities
+	 * @param a
+	 * @param b
+	 * @param matrixInHashMap
+	 * @return
+	 */
+	private static ArrayList<Integer> swap(ArrayList<Integer> listCities, int a, int b) {
+		int indexTmpA = listCities.indexOf(a);
+		int indexTmpB = listCities.indexOf(b);
+		int tempA = listCities.get(indexTmpA);
+		
+		listCities.set(indexTmpA, b);
+		listCities.set(indexTmpB, tempA);
+		
+		return listCities;
+	}
+	
+	private static int evaluateDistances(ArrayList<Integer> order, HashMap<Integer, ArrayList<Integer>> matrixInHashMap) {
+		int somme = 0;
+		int starter = order.get(0);
+		int last = order.get(order.size()-1);
+		while(order.size()>0) {
+			int min = 100000000;
+			for (int i = 0; i < order.size(); i++) {
+				if(min>matrixInHashMap.get(order.get(0)).get(i) && matrixInHashMap.get(order.get(0)).get(i)!=0) {
+					min = matrixInHashMap.get(order.get(0)).get(i);
+				}
+			}
+			if(min!=100000000) {
+				somme = somme + min;
+				order.remove(0);
+			}
+		}
+		// bouclement du circuit
+		somme = somme + matrixInHashMap.get(starter).get(last);
+		
+		return somme;
 	}
 
 	public static void main(String [] args) {
 		ArrayList<Data> datas_kroA100 = parseFile("kroA100.tsp");
 		HashMap<Integer, ArrayList<Integer>> matrixInHashMap = generateMatrixInHashMap(datas_kroA100);
-		//visualizeMatrix(matrixARandom);
-		ArrayList<Integer> cities = randomCities(datas_kroA100.size());
 		
-		//System.out.println("ville 79 : " + matrixInHashMap.get(79) + ";" +matrixInHashMap.get(79).size());
-		System.out.println("Solution : " + evaluateHeuristicSolutionWithHashMap(matrixInHashMap,19));
+		System.out.println("Solution à partir de la 1ère ville: " + evaluateDistances(evaluateHeuristicSolutionWithHashMap(matrixInHashMap,0), matrixInHashMap));
+		System.out.println(evaluateHeuristicSolutionWithHashMap(matrixInHashMap,0));
+		
+		System.out.println("Swap entre la 1ère ville et la 2ème : " + evaluateDistances(swap(evaluateHeuristicSolutionWithHashMap(matrixInHashMap,0), 0, 1),matrixInHashMap));
+		System.out.println(swap(evaluateHeuristicSolutionWithHashMap(matrixInHashMap,0), 0, 1));
 		
 		System.out.println("Best heuristic : " + bestHeuristic(matrixInHashMap));
+		
 	}
 }
