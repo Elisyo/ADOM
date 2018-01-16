@@ -160,6 +160,22 @@ public class Main {
 		
 		return somme;
 	}
+	
+	private static int bestHeuristic(HashMap<Integer, ArrayList<Integer>> matrixInHashMap) {
+		ArrayList<Integer> solutions = new ArrayList<Integer>();
+		for (int i = 0; i < matrixInHashMap.size(); i++) {
+			solutions.add(evaluateHeuristicSolutionWithHashMap(matrixInHashMap,i));
+		}
+		int min = 1000000000;
+		for (int i = 0; i < solutions.size(); i++) {
+			if(solutions.get(i)<min) {
+				min = solutions.get(i);
+			}
+		}
+		System.out.println(solutions);
+		
+		return min;
+	}
 
 	public static void main(String [] args) {
 		ArrayList<Data> datas_kroA100 = parseFile("kroA100.tsp");
@@ -169,5 +185,7 @@ public class Main {
 		
 		//System.out.println("ville 79 : " + matrixInHashMap.get(79) + ";" +matrixInHashMap.get(79).size());
 		System.out.println("Solution : " + evaluateHeuristicSolutionWithHashMap(matrixInHashMap,19));
+		
+		System.out.println("Best heuristic : " + bestHeuristic(matrixInHashMap));
 	}
 }
