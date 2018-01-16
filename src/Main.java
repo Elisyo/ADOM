@@ -136,12 +136,12 @@ public class Main {
 					if (actualCities.get(i)<min && actualCities.get(i)!=0) {
 						min = actualCities.get(i);
 						starter = i;
-						System.out.println("min : "+min);
+						//System.out.println("min : "+min);
 					}
 				} else if(starter == 0) {
 					if (actualCities.get(i)<min && actualCities.get(i)!=0) {
 						min = actualCities.get(i);
-						System.out.println("min : "+min);
+						//System.out.println("min : "+min);
 					}
 				}
 			}
@@ -155,6 +155,9 @@ public class Main {
 			System.out.println(starter);*/	
 		}
 		//ajout du dernier couple pour boucler la boucle
+		ArrayList<Integer> lastCities = matrixInHashMap.get(finalListCities.get(finalListCities.size()-1));
+		somme = somme + lastCities.get(finalListCities.get(0));
+		
 		return somme;
 	}
 
@@ -165,6 +168,6 @@ public class Main {
 		ArrayList<Integer> cities = randomCities(datas_kroA100.size());
 		
 		//System.out.println("ville 79 : " + matrixInHashMap.get(79) + ";" +matrixInHashMap.get(79).size());
-		evaluateHeuristicSolutionWithHashMap(matrixInHashMap,19);
+		System.out.println("Solution : " + evaluateHeuristicSolutionWithHashMap(matrixInHashMap,19));
 	}
 }
