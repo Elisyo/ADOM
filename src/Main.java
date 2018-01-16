@@ -143,13 +143,30 @@ public class Main {
 	 * @param matrixInHashMap
 	 * @return
 	 */
-	private static ArrayList<Integer> swap(ArrayList<Integer> listCities, int a, int b) {
+	private static ArrayList<Integer> voisinage(ArrayList<Integer> listCities, int a, int b, String options) {
 		int indexTmpA = listCities.indexOf(a);
 		int indexTmpB = listCities.indexOf(b);
-		int tempA = listCities.get(indexTmpA);
 		
-		listCities.set(indexTmpA, b);
-		listCities.set(indexTmpB, tempA);
+		switch (options) {
+		case "swap":
+			int tempA = listCities.get(indexTmpA);
+			
+			listCities.set(indexTmpA, b);
+			listCities.set(indexTmpB, tempA);
+			break;
+		case "two-opt":
+			// [0,1,2,3,4,5,6]
+			// two-opt (2,5)
+			// [0,1,5,4,3,2,6]
+			
+			
+			
+			break;
+		default:
+			System.out.println("Aucun parametre");
+			break;
+		}
+		
 		
 		return listCities;
 	}
@@ -183,8 +200,8 @@ public class Main {
 		System.out.println("Solution à partir de la 1ère ville: " + evaluateDistances(evaluateHeuristicSolutionWithHashMap(matrixInHashMap,0), matrixInHashMap));
 		System.out.println(evaluateHeuristicSolutionWithHashMap(matrixInHashMap,0));
 		
-		System.out.println("Swap entre la 1ère ville et la 2ème : " + evaluateDistances(swap(evaluateHeuristicSolutionWithHashMap(matrixInHashMap,0), 0, 1),matrixInHashMap));
-		System.out.println(swap(evaluateHeuristicSolutionWithHashMap(matrixInHashMap,0), 0, 1));
+		System.out.println("Swap entre la 1ère ville et la 2ème : " + evaluateDistances(voisinage(evaluateHeuristicSolutionWithHashMap(matrixInHashMap,0), 0, 1,"swap"),matrixInHashMap));
+		System.out.println(voisinage(evaluateHeuristicSolutionWithHashMap(matrixInHashMap,0), 0, 1,"swap"));
 		
 		System.out.println("Best heuristic : " + bestHeuristic(matrixInHashMap));
 		
