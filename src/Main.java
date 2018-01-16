@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Main {
 
@@ -41,40 +42,35 @@ public class Main {
 		}
 		return datas;
 	}
-
 	/**
-	 * Genere la matrice de cout selon la distance euclidienne entre 2 points
+	 * 
 	 * @param datas
-	 * @param options
 	 * @return
 	 */
-	private static MatrixData [][] generateMatrix(ArrayList<Data> datas, String options) {
-		MatrixData [][] matrix = new MatrixData [datas.size()][datas.size()];
-
+	private static HashMap<Integer, ArrayList<Integer>> generateMatrixInHashMap(ArrayList<Data> datas) {
+		HashMap<Integer, ArrayList<Integer>> resultat = new HashMap<Integer, ArrayList<Integer>> ();
 		int xa,xb,ya,yb;
-		for (int i = 0; i < matrix.length; i++) {
+		for (int i = 0; i < datas.size(); i++) {
 			xa = datas.get(i).getCoord_X();
 			ya = datas.get(i).getCoord_Y();
-			for (int j = 0; j < matrix.length; j++) {
+			ArrayList<Integer> distances = new ArrayList<Integer>();
+			for (int j = 0; j < datas.size(); j++) {
 				xb = datas.get(j).getCoord_X();
 				yb = datas.get(j).getCoord_Y();
-
-				// distance euclidienne entre 2 points :
-				// -------------------------------------
-				// racine((xA-xB)²+(yA-yB)²
-				//______________________________________
-				if(i<j) {
-					matrix[i][j]= new MatrixData(Math.round(Math.sqrt(Math.pow((xa-xb), 2)+Math.pow((ya-yb), 2))));
-					// pour le random
-					if(options.equals("random")) {
-						matrix[j][i]= new MatrixData(Math.round(Math.sqrt(Math.pow((xa-xb), 2)+Math.pow((ya-yb), 2))));
-					}
-				}
+				//if(i<j)
+				distances.add((int) Math.round(Math.sqrt(Math.pow((xa-xb), 2)+Math.pow((ya-yb), 2))));
 			}
+			resultat.put(i, distances);
 		}
-		return matrix;
+		return resultat;
 	}
 
+	private static void visualizeMatrixInHashMap(HashMap<Integer, ArrayList<Integer>> MatrixInHashMap) {
+		for (int i = 0; i < MatrixInHashMap.size(); i++) {
+			System.out.println("ville "+ i + " : " + MatrixInHashMap.get(i));
+		}
+	}
+	
 	/**
 	 * Fonction permettant d'avoir un apercu terminal de la matrice
 	 * @param matrix
@@ -91,18 +87,6 @@ public class Main {
 			System.out.println();
 		}
 
-	}
-
-	private static int evaluateRandomSolution(MatrixData [][] matrix,ArrayList<Integer> cities) {
-		int resultat = 0;
-		for (int i = 0; i < cities.size(); i++) {
-			if(i == cities.size()-1) {
-				resultat = (int) (resultat + matrix[cities.get(0)-1][cities.get(i)-1].getDistance());
-			} else {
-				resultat = (int) (resultat + matrix[cities.get(i)-1][cities.get(i+1)-1].getDistance());
-			}
-		}
-		return resultat;
 	}
 
 	/**
@@ -127,168 +111,60 @@ public class Main {
 		return cities;
 	}
 
-	private static int evaluateHeuristicSolution(MatrixData [][] matrix,int x, int y){
+	private static int evaluateHeuristicSolutionWithHashMap(HashMap<Integer, ArrayList<Integer>> matrixInHashMap, int starter) {
+		ArrayList<Integer> availableCities = new ArrayList<Integer>();
+		ArrayList<Integer> finalListCities = new ArrayList<Integer>();
+		
+		int min = 1000000000;
 		int somme = 0;
-		int newX=0;
-		int newY=0;
-		boolean allCitiesChecked = false;
-		double min = 10000000;
-		// partie verticale de la croix
-		for (int i = 0; i < matrix.length; i++) {
-			if(matrix[i][y]!=null) {
-				if(matrix[i][y].getDistance()<min && !matrix[i][y].isAncestor()) {
-					min = matrix[i][y].getDistance();
-					System.out.println("vertical : " + min);
-					allCitiesChecked = false;
-					newX=i;
-					newY=y;
-				} else if(matrix[i][y].isAncestor()&& min!=10000000){
-					allCitiesChecked = true;
-				}
-			}
+		
+		//visualizeMatrixInHashMap(matrixInHashMap);
+		
+		for (int i = 0; i < matrixInHashMap.size(); i++) {
+			availableCities.add(i);
 		}
-		// partie horizontale de la croix
-		for (int j = 0; j < matrix.length; j++) {
-			if(matrix[x][j]!=null) {
-				if(matrix[x][j].getDistance()<min && !matrix[x][j].isAncestor()) {
-					min = matrix[x][j].getDistance();
-					System.out.println("horizontal : " + min);
-					allCitiesChecked = false;
-					newX=x;
-					newY=j;
-				} else if(matrix[x][j].isAncestor()&& min!=10000000){
-					allCitiesChecked = true;
-				}
-			}
-		}
+		
+		while(availableCities.size()>0) {
+			min = 1000000000;
+			finalListCities.add(starter);
+			availableCities.remove(availableCities.indexOf(starter));
+			ArrayList<Integer> actualCities = matrixInHashMap.get(starter);
 
-		somme = (int) min;
-		matrix[newX][newY].setAncestor(true);
-		System.out.println("min final : " + min);
-		if(!allCitiesChecked) {
-			return somme + evaluateHeuristicSolution(matrix, newX, newY);
-		} else {
-			return somme;
-		}
-	}
-
-	private static int evaluateHeuristicSolutionTaille(MatrixData [][] matrix,int x, int y,int alter, int TAILLE){
-		int somme = 0;
-		int newX=0;//ligne
-		int newY=0;//colonne
-		boolean allCitiesChecked = false;
-		double min = 10000000;
-
-		//visualizeMatrix(matrix,TAILLE);
-
-		if(alter==0 || alter ==1) {
-			//vue sur la ligne ciblee
-			//System.out.println("Ciblage sur la ligne");
-			for (int i = 0; i < TAILLE; i++) {
-				if(matrix[x][i]!=null) {
-					if(matrix[x][i].getDistance()<min && !matrix[x][i].isAncestor()) {
-						//System.out.println(matrix[x][i]);
-						min = matrix[x][i].getDistance();
-						newX=x;
-						newY=i;
-						alter=3;
+			for (int i = 0; i < actualCities.size(); i++) {
+				//System.out.println(availableCities.contains(availableCities.indexOf(i)));
+				if(!finalListCities.contains(i)) {
+					if (actualCities.get(i)<min && actualCities.get(i)!=0) {
+						min = actualCities.get(i);
+						starter = i;
+						System.out.println("min : "+min);
+					}
+				} else if(starter == 0) {
+					if (actualCities.get(i)<min && actualCities.get(i)!=0) {
+						min = actualCities.get(i);
+						System.out.println("min : "+min);
 					}
 				}
 			}
-		}
-		
-
-		if(alter==0 || alter ==2) {
-			//vue sur la colonne ciblee
-			//System.out.println("Ciblage sur la colonne");
-			for (int i = 0; i < TAILLE; i++) {
-				if(matrix[i][y]!=null) {
-					if(matrix[i][y].getDistance()<min && !matrix[i][y].isAncestor()) {
-						//System.out.println(matrix[i][y]);
-						min = matrix[i][y].getDistance();
-						newX=i;
-						newY=y;
-						alter=1;
-					}
-				}
+			if(min!=1000000000) {
+				somme = somme + min;
 			}
+			/*
+			System.out.println(finalListCities);
+			System.out.println(availableCities);
+			System.out.println(somme);
+			System.out.println(starter);*/	
 		}
-		//ligne
-		if(alter==3) {
-			alter=2;
-			for (int i = 0; i < TAILLE; i++) {
-				if(matrix[newX][i]!=null)
-					matrix[newX][i].setAncestor(true);
-			}
-		}
-		//colonne
-		if(alter==1) {
-			for (int i = 0; i < TAILLE; i++) {
-				if(matrix[i][newY]!=null)
-					matrix[i][newY].setAncestor(true);
-			}
-		}
-		
-		System.out.println("min final du ciblage : " + min + " ("+newX+";"+newY+") - alter : " + alter);
-
-		somme = (int) (somme + min);
-
-		return somme + evaluateHeuristicSolutionTaille(matrix, newX, newY, alter, TAILLE);
-
-
-		/*
-
-		// partie verticale de la croix
-		for (int i = 0; i < TAILLE; i++) {
-			if(matrix[i][y]!=null) {
-				if(matrix[i][y].getDistance()<min && !matrix[i][y].isAncestor()) {
-					min = matrix[i][y].getDistance();
-					System.out.println("vertical : " + min);
-					allCitiesChecked = false;
-					newX=i;
-					newY=y;
-				} else if(matrix[i][y].isAncestor()&& min!=10000000){
-					allCitiesChecked = true;
-				}
-			}
-		}
-		// partie horizontale de la croix
-		for (int j = 0; j < TAILLE; j++) {
-			if(matrix[x][j]!=null) {
-				if(matrix[x][j].getDistance()<min && !matrix[x][j].isAncestor()) {
-					min = matrix[x][j].getDistance();
-					System.out.println("horizontal : " + min);
-					allCitiesChecked = false;
-					newX=x;
-					newY=j;
-				} else if(matrix[x][j].isAncestor()&& min!=10000000){
-					allCitiesChecked = true;
-				}
-			}
-		}
-
-		somme = (int) min;
-		matrix[newX][newY].setAncestor(true);
-		System.out.println("min final : " + min);
-		if(!allCitiesChecked) {
-			return somme + evaluateHeuristicSolution(matrix, newX, newY);
-		} else {
-			return somme;
-		}
-
-		 */
+		//ajout du dernier couple pour boucler la boucle
+		return somme;
 	}
 
 	public static void main(String [] args) {
 		ArrayList<Data> datas_kroA100 = parseFile("kroA100.tsp");
-		MatrixData [][] matrixARandom = generateMatrix(datas_kroA100,"random");
-		MatrixData [][] matrixAHeuristic = generateMatrix(datas_kroA100,"heuristic");
+		HashMap<Integer, ArrayList<Integer>> matrixInHashMap = generateMatrixInHashMap(datas_kroA100);
 		//visualizeMatrix(matrixARandom);
 		ArrayList<Integer> cities = randomCities(datas_kroA100.size());
-		// Meilleure solution connue pour kroA100 : 21282
-		System.out.println("Cout de la solution par random : "+ evaluateRandomSolution(matrixARandom, cities));
-		//visualizeMatrix(matrixAHeuristic);
-		System.out.println("Cout de la solution heuristique : "+ evaluateHeuristicSolutionTaille(matrixAHeuristic,1,1,0,matrixAHeuristic.length));
+		
+		//System.out.println("ville 79 : " + matrixInHashMap.get(79) + ";" +matrixInHashMap.get(79).size());
+		evaluateHeuristicSolutionWithHashMap(matrixInHashMap,19);
 	}
-
 }
