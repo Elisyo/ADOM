@@ -249,6 +249,11 @@ public class MainAdom {
 		return listCities;
 	}
 	
+	private ArrayList<Integer> mouvement(ArrayList<Integer> listCities, int a, int b, String options){
+		
+		return listCities;
+	}
+	
 	private static int evaluateDistances(ArrayList<Integer> order, HashMap<Integer, ArrayList<Integer>> matrixInHashMap) {
 		int somme = 0;
 		int starter = order.get(0);
