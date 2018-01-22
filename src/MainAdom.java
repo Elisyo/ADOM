@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Main {
+public class MainAdom {
 
 	/**
 	 * Fonction qui parse le fichier donné en entrée et qui renvoie la liste composée des datas
