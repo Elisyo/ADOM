@@ -74,6 +74,27 @@ public class MainAdom {
 			System.out.println("ville "+ i + " : " + MatrixInHashMap.get(i));
 		}
 	}
+	
+	private static ArrayList<ArrayList<Integer>> initialisationPopulation(HashMap<Integer, ArrayList<Integer>> matrixInHashMap,int nbPop, String optionsInit,String optionsMouv, int starter) {
+		ArrayList<ArrayList<Integer>> worldPopulation = new ArrayList<ArrayList<Integer>>();
+		
+		ArrayList<Integer> random = new ArrayList<Integer>();
+		int i = 0;
+		while (i < nbPop) {
+			random = initialisation(matrixInHashMap, "random","", 0);
+			
+			if(!worldPopulation.contains(random)) {
+				worldPopulation.add(random);
+				i++;
+			}
+		}
+		
+		
+		
+		
+		
+		return worldPopulation;
+	}
 
 	/**
 	 * Démarre une solution aléatoire ou heuristique
@@ -393,6 +414,14 @@ public class MainAdom {
 		System.out.println(semiHeuristicFromFirstCity);
 
 		System.out.println("========================================================================");
-
+		System.out.println("=======================TP 3 : algorithme genetique======================");
+		System.out.println("========================================================================");
+		
+		ArrayList<ArrayList<Integer>> worldPopulation = initialisationPopulation(matrixInHashMap, 10, "random", "", 0);
+		for (int i = 0; i < worldPopulation.size(); i++) {
+			System.out.println(evaluateDistances(worldPopulation.get(i),matrixInHashMap) + " : " + worldPopulation.get(i));
+		}
+		
+		
 	}
 }
