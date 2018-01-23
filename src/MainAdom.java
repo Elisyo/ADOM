@@ -81,17 +81,17 @@ public class MainAdom {
 	 * @param options
 	 * @return
 	 */
-	private static ArrayList<Integer> initialisation(HashMap<Integer, ArrayList<Integer>> matrixInHashMap, String options, int starter) {
+	private static ArrayList<Integer> initialisation(HashMap<Integer, ArrayList<Integer>> matrixInHashMap, String optionsInit,String optionsMouv, int starter) {
 		ArrayList<Integer> listCities = new ArrayList<Integer>();
-		switch (options) {
+		switch (optionsInit) {
 		case "random":
 			listCities = randomList();
 			break;
-		case "heuristic":
-			listCities = heuristicWithHashMap(matrixInHashMap, starter);
+		case "mouvement":
+			listCities = mouvement(matrixInHashMap,optionsMouv, starter);
 			break;
 		default:
-			System.out.println("Aucun parametre");
+			System.out.println("Parametre d'initialisation non valide : 'random' OU 'mouvement'");
 			break;
 		}
 		return listCities;
@@ -114,12 +114,27 @@ public class MainAdom {
 		return result;
 	}
 	
+	private static ArrayList<Integer> mouvement(HashMap<Integer, ArrayList<Integer>> matrixInHashMap, String options, int starter){
+		ArrayList<Integer> listCities = new ArrayList<Integer>();
+		switch (options) {
+		case "semi-heuristic":
+			listCities = semiHeuristicWithHashMap(matrixInHashMap, starter);
+			break;
+		case "heuristic":
+			listCities = heuristicWithHashMap(matrixInHashMap, starter);
+			break;
+		default:
+			System.out.println("Parametre de mouvement non valide : 'semi-heuristic' OU 'heuristic'");
+			break;
+		}
+		return listCities;
+	}
+	
 	private static ArrayList<Integer> heuristicWithHashMap(HashMap<Integer, ArrayList<Integer>> matrixInHashMap, int starter) {
 		ArrayList<Integer> availableCities = new ArrayList<Integer>();
 		ArrayList<Integer> finalListCities = new ArrayList<Integer>();
 
 		int min = 1000000000;
-		int somme = 0;
 
 		for (int i = 0; i < matrixInHashMap.size(); i++) {
 			availableCities.add(i);
@@ -143,8 +158,71 @@ public class MainAdom {
 					}
 				}
 			}
-			if(min!=1000000000) {
-				somme = somme + min;
+		}
+		return finalListCities;
+	}
+	
+	private static ArrayList<Integer> semiHeuristicWithHashMap(HashMap<Integer, ArrayList<Integer>> matrixInHashMap, int starter) {
+		ArrayList<Integer> availableCities = new ArrayList<Integer>();
+		ArrayList<Integer> finalListCities = new ArrayList<Integer>();
+
+		int min = 1000000000;
+		int secondMin = 1000000000;
+		boolean minFound = false;
+
+		for (int i = 0; i < matrixInHashMap.size(); i++) {
+			availableCities.add(i);
+		}
+
+		while(availableCities.size()>0) {
+			finalListCities.add(starter);
+			availableCities.remove(availableCities.indexOf(starter));
+			if(availableCities.size()!=0) {
+				ArrayList<Integer> actualCities = matrixInHashMap.get(starter);
+				minFound = false;
+
+				if(availableCities.size()>3) {
+					if(actualCities.get(availableCities.get(0))==0) {
+						min = actualCities.get(availableCities.get(1));
+						secondMin = actualCities.get(availableCities.get(2));
+					} else {
+						min = actualCities.get(availableCities.get(0));
+						secondMin = actualCities.get(availableCities.get(1));
+					}
+				} else if(availableCities.size()>2) {
+					if(actualCities.get(availableCities.get(0))==0) {
+						min = actualCities.get(availableCities.get(1));
+					} else {
+						min = actualCities.get(availableCities.get(0));
+					}
+				} else {
+					min = actualCities.get(availableCities.get(0));
+				}
+				
+				for (int i = 0; i < actualCities.size(); i++) {
+					if(!finalListCities.contains(i)) {
+						if (actualCities.get(i)<min && actualCities.get(i)!=0 && !minFound) {
+							min = actualCities.get(i);
+							starter = i;
+							minFound = true;
+						} else if(actualCities.get(i)<secondMin && actualCities.get(i)!=0){
+							secondMin = actualCities.get(i);
+							starter = i;
+						}
+					} else if(starter == 0) {
+						if (actualCities.get(i)<min && actualCities.get(i)!=0 && !minFound) {
+							min = actualCities.get(i);
+							minFound = true;
+						} else if(actualCities.get(i)<secondMin && actualCities.get(i)!=0){
+							secondMin = actualCities.get(i);
+							starter = i;
+						}
+					}
+				}
+				//gerer si le min est tout seul
+				if(min == actualCities.get(availableCities.get(0)) && availableCities.size()==1) {
+					starter = availableCities.get(0);
+				}
 			}
 		}
 		return finalListCities;
@@ -181,7 +259,7 @@ public class MainAdom {
 			listCities = two_opt(listCities, a, b);
 			break;
 		default:
-			System.out.println("Aucun parametre");
+			System.out.println("Parametre de mouvement non valide : 'swap' OU 'two-opt'");
 			break;
 		}
 		return listCities;
@@ -249,25 +327,27 @@ public class MainAdom {
 		return listCities;
 	}
 	
-	private ArrayList<Integer> mouvement(ArrayList<Integer> listCities, int a, int b, String options){
-		
-		return listCities;
-	}
-	
 	private static int evaluateDistances(ArrayList<Integer> order, HashMap<Integer, ArrayList<Integer>> matrixInHashMap) {
 		int somme = 0;
 		int starter = order.get(0);
 		int last = order.get(order.size()-1);
-		while(order.size()>0) {
+		
+		ArrayList<Integer> currentCities = new ArrayList<Integer>();
+		
+		for (int i = 0; i < order.size(); i++) {
+			currentCities.add(order.get(i));
+		}
+		
+		while(currentCities.size()>0) {
 			int min = 100000000;
-			for (int i = 0; i < order.size(); i++) {
-				if(min>matrixInHashMap.get(order.get(0)).get(i) && matrixInHashMap.get(order.get(0)).get(i)!=0) {
-					min = matrixInHashMap.get(order.get(0)).get(i);
+			for (int i = 0; i < currentCities.size(); i++) {
+				if(min>matrixInHashMap.get(currentCities.get(0)).get(i) && matrixInHashMap.get(currentCities.get(0)).get(i)!=0) {
+					min = matrixInHashMap.get(currentCities.get(0)).get(i);
 				}
 			}
 			if(min!=100000000) {
 				somme = somme + min;
-				order.remove(0);
+				currentCities.remove(0);
 			}
 		}
 		// bouclement du circuit
@@ -280,18 +360,21 @@ public class MainAdom {
 		ArrayList<Data> datas_kroA100 = parseFile("kroA100.tsp");
 		HashMap<Integer, ArrayList<Integer>> matrixInHashMap = generateMatrixInHashMap(datas_kroA100);
 
-		System.out.println("Solution à partir de la 1ère ville: " + evaluateDistances(initialisation(matrixInHashMap, "heuristic", 0), matrixInHashMap));
-		System.out.println(initialisation(matrixInHashMap, "heuristic", 0));
+		//visualizeMatrixInHashMap(matrixInHashMap);
+		
+		ArrayList<Integer> heuristicFromFirstCity = initialisation(matrixInHashMap, "mouvement", "heuristic", 0);
+		System.out.println("Solution à partir de la 1ère ville: " + evaluateDistances(heuristicFromFirstCity,matrixInHashMap));
+		System.out.println(heuristicFromFirstCity);
 
 		System.out.println("========================================================================");
 
-		System.out.println("Swap entre la 1ère ville et la 2ème : " + evaluateDistances(voisinage(initialisation(matrixInHashMap, "heuristic", 0), 0, 1,"swap"),matrixInHashMap));
-		System.out.println(voisinage(initialisation(matrixInHashMap, "heuristic", 0), 0, 1,"swap"));
+		System.out.println("Swap entre la 1ère ville et la 2ème : " + evaluateDistances(voisinage(heuristicFromFirstCity, 0, 1,"swap"),matrixInHashMap));
+		System.out.println(voisinage(initialisation(matrixInHashMap, "mouvement", "heuristic", 0), 0, 1,"swap"));
 
 		System.out.println("========================================================================");
 
-		System.out.println("Two-opt entre la 1ère ville et la 2ème : " + evaluateDistances(voisinage(initialisation(matrixInHashMap, "heuristic", 0), 0, 1,"two-opt"),matrixInHashMap));
-		System.out.println(voisinage(initialisation(matrixInHashMap, "heuristic", 0), 0, 1,"two-opt"));
+		System.out.println("Two-opt entre la 1ère ville et la 2ème : " + evaluateDistances(voisinage(heuristicFromFirstCity, 0, 1,"two-opt"),matrixInHashMap));
+		System.out.println(voisinage(initialisation(matrixInHashMap, "mouvement", "heuristic", 0), 0, 1,"two-opt"));
 		
 		System.out.println("========================================================================");
 		
@@ -299,10 +382,15 @@ public class MainAdom {
 		
 		System.out.println("========================================================================");
 		
-		ArrayList<Integer> random = initialisation(matrixInHashMap, "random", 0);
-		System.out.println("Random list :\n--------------");
+		ArrayList<Integer> random = initialisation(matrixInHashMap, "random","", 0);
+		System.out.println("Random list : " + evaluateDistances(random, matrixInHashMap));
 		System.out.println(random);
-		System.out.println("Distance : " + evaluateDistances(random, matrixInHashMap));
+
+		System.out.println("========================================================================");
+		
+		ArrayList<Integer> semiHeuristicFromFirstCity = initialisation(matrixInHashMap, "mouvement", "semi-heuristic", 0);
+		System.out.println("Solution semi-heuristique à partir de la 1ère ville: " + evaluateDistances(semiHeuristicFromFirstCity,matrixInHashMap));
+		System.out.println(semiHeuristicFromFirstCity);
 
 		System.out.println("========================================================================");
 
