@@ -74,6 +74,20 @@ public class MainAdom {
 			System.out.println("ville "+ i + " : " + MatrixInHashMap.get(i));
 		}
 	}
+	
+	/**
+	 * Permet de visualiser notre population mondiale
+	 * @param worldPopulation
+	 * @param matrixInHashMap
+	 */
+	private static void seeWorldPopulation(ArrayList<ArrayList<Integer>> worldPopulation,HashMap<Integer, ArrayList<Integer>> matrixInHashMap) {
+		System.out.println("========================================================================");
+		System.out.println("=======================    Population mondiale    ======================");
+		for (int i = 0; i < worldPopulation.size(); i++) {
+			System.out.println(evaluateDistances(worldPopulation.get(i),matrixInHashMap) + " : " + worldPopulation.get(i));
+		}
+		System.out.println("========================================================================");
+	}
 
 	private static ArrayList<ArrayList<Integer>> initialisationPopulation(HashMap<Integer, ArrayList<Integer>> matrixInHashMap,int nbPop, String optionsInit,String optionsMouv, int starter) {
 		ArrayList<ArrayList<Integer>> worldPopulation = new ArrayList<ArrayList<Integer>>();
@@ -343,6 +357,184 @@ public class MainAdom {
 
 		return listCities;
 	}
+	
+	/**
+	 * Parmi la population, sélectionner 2 parents (ceux avec les meilleurs résultats)
+	 * Se servir du 1er parent en sélectionnant un segment entre 2 villes choisies aléatoirement
+	 * Compléter ce segment avec les villes du 2ème parent
+	 * Cela crée notre enfant
+	 * @param worldPopulation
+	 * @param matrixInHashMap
+	 * @return newWorldPopulation
+	 */
+	private static ArrayList<ArrayList<Integer>> orderBasedCrossover(ArrayList<ArrayList<Integer>> worldPopulation,HashMap<Integer, ArrayList<Integer>> matrixInHashMap){
+		ArrayList<ArrayList<Integer>> newWorldPopulation = new ArrayList<ArrayList<Integer>>();
+		ArrayList<Integer> distances = new ArrayList<Integer>();
+		for (int i = 0; i < worldPopulation.size(); i++) {
+			newWorldPopulation.add(worldPopulation.get(i));
+			distances.add(evaluateDistances(newWorldPopulation.get(i),matrixInHashMap));
+		}
+		
+		int minDistance1=distances.get(0);
+		for (Integer distance : distances) {
+			if(distance<minDistance1) {
+				minDistance1=distance;
+			}
+		}
+		int minDistance2=distances.get(0);
+		for (Integer distance : distances) {
+			if(distance<minDistance2 && distance!=minDistance1) {
+				minDistance2=distance;
+			}
+		}
+		ArrayList<Integer> parent1 = newWorldPopulation.get(distances.indexOf(minDistance1));
+		ArrayList<Integer> parent2 = newWorldPopulation.get(distances.indexOf(minDistance2));
+		
+		seeWorldPopulation(newWorldPopulation, matrixInHashMap);
+		
+		int frag1 = (int) (Math.random()*100-1);
+		int frag2 = (int) (Math.random()*100-1);
+		while(frag1==frag2) {
+			frag2 = (int) (Math.random()*100-1);
+		}
+		int fragTmp = 0;
+		if(parent1.indexOf(frag1)>parent1.indexOf(frag2)) {
+			fragTmp = frag1;
+			frag1 = frag2;
+			frag2 = fragTmp;
+		}
+		
+		ArrayList<Integer> segmentParent1 = new ArrayList<Integer>();
+		for (int i = parent1.indexOf(frag1); i <= parent1.indexOf(frag2); i++) {
+			segmentParent1.add(parent1.get(i));
+		}
+		
+		System.out.println(frag1 + " : " + frag2);
+		System.out.println(parent1);
+		System.out.println(segmentParent1);
+		
+		
+		System.out.println("parent 2 : " + parent2);
+		fragTmp = 0;
+		boolean reversed = false;
+		if(parent2.indexOf(frag1)>parent2.indexOf(frag2)) {
+			fragTmp = frag1;
+			frag1 = frag2;
+			frag2 = fragTmp;
+			reversed = true;
+		}
+		
+		ArrayList<Integer> alreadyTakenCities = new ArrayList<Integer>();
+		for (int i = 0; i < segmentParent1.size(); i++) {
+			if(!alreadyTakenCities.contains(segmentParent1.get(i))) {
+				alreadyTakenCities.add(segmentParent1.get(i));
+			}
+		}
+		
+		ArrayList<Integer> segmentDebut = new ArrayList<Integer>();
+		ArrayList<Integer> segmentFin = new ArrayList<Integer>();
+		
+		if(parent2.indexOf(frag1)!=0) {
+			for (int i = 0; i < parent2.indexOf(frag1); i++) {
+				if(!alreadyTakenCities.contains(parent2.get(i))) {
+					segmentDebut.add(parent2.get(i));
+					alreadyTakenCities.add(parent2.get(i));
+				}
+			}
+		}
+		
+		if(parent2.indexOf(frag2)!=parent2.size()-1) {
+			for (int i = parent2.indexOf(frag2)+1; i < parent2.size(); i++) {
+				if(!alreadyTakenCities.contains(parent2.get(i))) {
+					segmentFin.add(parent2.get(i));
+					alreadyTakenCities.add(parent2.get(i));
+				}
+			}
+		}
+		System.out.println(segmentDebut);
+		System.out.println(segmentFin);
+		
+		ArrayList<Integer> availableCities = new ArrayList<Integer>();
+		for (int i = 0; i < 100; i++) {
+			if(!alreadyTakenCities.contains(i)) {
+				availableCities.add(i);
+			}
+		}
+		System.out.println("available Cities : " + availableCities);
+		ArrayList<Integer> finalListCities = new ArrayList<Integer>();
+		int min = 0;
+		int starter = 0;
+		if(availableCities.size()!=0) {
+			starter = availableCities.get(0);
+			while(availableCities.size()>0) {
+				min = 1000000000;
+				finalListCities.add(starter);
+				availableCities.remove(availableCities.indexOf(starter));
+				ArrayList<Integer> actualCities = matrixInHashMap.get(starter);
+
+				for (int i = 0; i < actualCities.size(); i++) {
+					if(!finalListCities.contains(i) && availableCities.contains(i)) {
+						if (actualCities.get(i)<min && actualCities.get(i)!=0) {
+							min = actualCities.get(i);
+							starter = i;
+						}
+					} else if(starter == 0) {
+						if (actualCities.get(i)<min && actualCities.get(i)!=0) {
+							min = actualCities.get(i);
+						}
+					}
+				}
+			}
+		}
+		ArrayList<Integer> prodigalChild = new ArrayList<Integer>();
+		if(!reversed) {
+			for (int i = 0; i < segmentDebut.size(); i++) {
+				prodigalChild.add(segmentDebut.get(i));
+			}
+			for (int i = 0; i < segmentParent1.size(); i++) {
+				prodigalChild.add(segmentParent1.get(i));
+			}
+			for (int i = 0; i < segmentFin.size(); i++) {
+				prodigalChild.add(segmentFin.get(i));
+			}
+		} else {
+			if(segmentDebut.size()!=0) {
+				segmentDebut = two_opt(segmentDebut, segmentDebut.get(0), segmentDebut.get(segmentDebut.size()-1));
+			}
+			if(segmentFin.size()!=0) {
+				segmentFin = two_opt(segmentFin, segmentFin.get(0), segmentFin.get(segmentFin.size()-1));
+			}
+			for (int i = 0; i < segmentFin.size(); i++) {
+				prodigalChild.add(segmentFin.get(i));
+			}
+			for (int i = 0; i < segmentParent1.size(); i++) {
+				prodigalChild.add(segmentParent1.get(i));
+			}
+			for (int i = 0; i < segmentDebut.size(); i++) {
+				prodigalChild.add(segmentDebut.get(i));
+			}
+		}
+		for (int i = 0; i < finalListCities.size(); i++) {
+			prodigalChild.add(finalListCities.get(i));
+		}
+		
+		
+		int maxDistance = 0;
+		for (Integer distance : distances) {
+			if(maxDistance>distance) {
+				maxDistance=distance;
+			}
+		}
+		if(evaluateDistances(prodigalChild, matrixInHashMap)<evaluateDistances(newWorldPopulation.get(distances.indexOf(maxDistance)+1), matrixInHashMap)) {
+			newWorldPopulation.set(distances.indexOf(maxDistance)+1, prodigalChild);
+		}
+		
+		
+		System.out.println(evaluateDistances(prodigalChild, matrixInHashMap) + " : " + prodigalChild);
+		seeWorldPopulation(newWorldPopulation, matrixInHashMap);
+		
+		return newWorldPopulation;
+	}
 
 	private static int evaluateDistances(ArrayList<Integer> order, HashMap<Integer, ArrayList<Integer>> matrixInHashMap) {
 		int somme = 0;
@@ -414,10 +606,8 @@ public class MainAdom {
 		System.out.println("========================================================================");
 
 		ArrayList<ArrayList<Integer>> worldPopulation = initialisationPopulation(matrixInHashMap, 10, "mouvement", "heuristic", 0);
-		for (int i = 0; i < worldPopulation.size(); i++) {
-			System.out.println(evaluateDistances(worldPopulation.get(i),matrixInHashMap) + " : " + worldPopulation.get(i));
-		}
 
-
+		worldPopulation = orderBasedCrossover(worldPopulation, matrixInHashMap);
+		
 	}
 }
