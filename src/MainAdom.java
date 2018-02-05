@@ -521,12 +521,13 @@ public class MainAdom {
 		
 		int maxDistance = 0;
 		for (Integer distance : distances) {
-			if(maxDistance>distance) {
+			if(maxDistance<distance) {
 				maxDistance=distance;
 			}
 		}
 		if(evaluateDistances(prodigalChild, matrixInHashMap)<evaluateDistances(newWorldPopulation.get(distances.indexOf(maxDistance)+1), matrixInHashMap)) {
-			newWorldPopulation.set(distances.indexOf(maxDistance)+1, prodigalChild);
+			if(!newWorldPopulation.contains(prodigalChild))
+				newWorldPopulation.set(distances.indexOf(maxDistance), prodigalChild);
 		}
 		
 		
