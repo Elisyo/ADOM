@@ -7,6 +7,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * @author guilbertf
+ * @author clemence
+ */
 public class MainAdom {
 
 	/**
@@ -42,8 +46,9 @@ public class MainAdom {
 		}
 		return datas;
 	}
+	
 	/**
-	 * 
+	 * Génération de la matrice par une HashMap : (ville, [distance entre cette ville et les autres])
 	 * @param datas
 	 * @return
 	 */
@@ -89,6 +94,15 @@ public class MainAdom {
 		System.out.println("========================================================================");
 	}
 
+	/**
+	 * Initialisation de plusieurs ensemble de 100 villes avec des ordres différents
+	 * @param matrixInHashMap
+	 * @param nbPop
+	 * @param optionsInit
+	 * @param optionsMouv
+	 * @param starter
+	 * @return
+	 */
 	private static ArrayList<ArrayList<Integer>> initialisationPopulation(HashMap<Integer, ArrayList<Integer>> matrixInHashMap,int nbPop, String optionsInit,String optionsMouv, int starter) {
 		ArrayList<ArrayList<Integer>> worldPopulation = new ArrayList<ArrayList<Integer>>();
 		ArrayList<Integer> random = new ArrayList<Integer>();
@@ -96,7 +110,6 @@ public class MainAdom {
 
 		while (starters.size() < nbPop) {
 			random = initialisation(matrixInHashMap, optionsInit,optionsMouv, starter);
-
 			if(!worldPopulation.contains(random)) {
 				worldPopulation.add(random);
 				starters.add(starter);
@@ -128,6 +141,10 @@ public class MainAdom {
 		return listCities;
 	}
 
+	/**
+	 * Renvoie une liste aléatoire entre 0 et 99
+	 * @return
+	 */
 	private static ArrayList<Integer> randomList(){
 		ArrayList<Integer> result = new ArrayList<Integer>();
 		ArrayList<Integer> availableCities = new ArrayList<Integer>();
@@ -141,10 +158,16 @@ public class MainAdom {
 			result.add(availableCities.get(r));
 			availableCities.remove(r);
 		}
-
 		return result;
 	}
 
+	/**
+	 * Suite à l'initialisation, précision entre semi-heuristique et heuristique
+	 * @param matrixInHashMap
+	 * @param options
+	 * @param starter
+	 * @return
+	 */
 	private static ArrayList<Integer> mouvement(HashMap<Integer, ArrayList<Integer>> matrixInHashMap, String options, int starter){
 		ArrayList<Integer> listCities = new ArrayList<Integer>();
 		switch (options) {
@@ -161,6 +184,12 @@ public class MainAdom {
 		return listCities;
 	}
 
+	/**
+	 * Resultat heuristique à partir d'une ville de départ (starter)
+	 * @param matrixInHashMap
+	 * @param starter
+	 * @return
+	 */
 	private static ArrayList<Integer> heuristicWithHashMap(HashMap<Integer, ArrayList<Integer>> matrixInHashMap, int starter) {
 		ArrayList<Integer> availableCities = new ArrayList<Integer>();
 		ArrayList<Integer> finalListCities = new ArrayList<Integer>();
@@ -193,6 +222,12 @@ public class MainAdom {
 		return finalListCities;
 	}
 
+	/**
+	 * Resultat semi-heuristique à partir d'une ville de départ (starter)
+	 * @param matrixInHashMap
+	 * @param starter
+	 * @return
+	 */
 	private static ArrayList<Integer> semiHeuristicWithHashMap(HashMap<Integer, ArrayList<Integer>> matrixInHashMap, int starter) {
 		ArrayList<Integer> availableCities = new ArrayList<Integer>();
 		ArrayList<Integer> finalListCities = new ArrayList<Integer>();
@@ -259,6 +294,11 @@ public class MainAdom {
 		return finalListCities;
 	}
 
+	/**
+	 * Fonction "test" qui calcule selon tous les starters possibles l'heuristique associé
+	 * @param matrixInHashMap
+	 * @return
+	 */
 	private static int bestHeuristic(HashMap<Integer, ArrayList<Integer>> matrixInHashMap) {
 		ArrayList<Integer> solutions = new ArrayList<Integer>();
 		for (int i = 0; i < matrixInHashMap.size(); i++) {
@@ -413,7 +453,6 @@ public class MainAdom {
 		System.out.println(parent1);
 		System.out.println(segmentParent1);
 		
-		
 		System.out.println("parent 2 : " + parent2);
 		fragTmp = 0;
 		boolean reversed = false;
@@ -518,7 +557,6 @@ public class MainAdom {
 			prodigalChild.add(finalListCities.get(i));
 		}
 		
-		
 		int maxDistance = 0;
 		for (Integer distance : distances) {
 			if(maxDistance<distance) {
@@ -530,13 +568,18 @@ public class MainAdom {
 				newWorldPopulation.set(distances.indexOf(maxDistance), prodigalChild);
 		}
 		
-		
 		System.out.println(evaluateDistances(prodigalChild, matrixInHashMap) + " : " + prodigalChild);
 		seeWorldPopulation(newWorldPopulation, matrixInHashMap);
 		
 		return newWorldPopulation;
 	}
 
+	/**
+	 * Calcul des distances entre les points des différentes villes
+	 * @param order
+	 * @param matrixInHashMap
+	 * @return
+	 */
 	private static int evaluateDistances(ArrayList<Integer> order, HashMap<Integer, ArrayList<Integer>> matrixInHashMap) {
 		int somme = 0;
 		int starter = order.get(0);
