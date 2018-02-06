@@ -154,7 +154,7 @@ public class MainAdom {
 		}
 		int r =0;
 		while(availableCities.size()!=0) {
-			r = (int) (Math.random()* (availableCities.size()-0));
+			r = (int) (Math.random()* (availableCities.size()-1));
 			result.add(availableCities.get(r));
 			availableCities.remove(r);
 		}
@@ -573,6 +573,29 @@ public class MainAdom {
 		
 		return newWorldPopulation;
 	}
+	
+	/**
+	 * Mutation selon un taux donné
+	 * @param actualChild
+	 * @param mutationRate
+	 * @return
+	 */
+	private static ArrayList<Integer> mutation(ArrayList<Integer> actualChild, int mutationRate) {
+		int city1 = 0, city2 = 0;
+		int rate = actualChild.size()/mutationRate;
+		ArrayList<Integer> resultChild = new ArrayList<Integer>();
+		for (int i = 0; i < actualChild.size(); i++) {
+			resultChild.add(actualChild.get(i));
+		}
+		for (int i = 0; i < rate; i++) {
+			city1 =(int) (Math.random()* (100-1));
+			do {
+				city2 =(int) (Math.random()* (100-1));
+			}while(city1==city2);
+			resultChild = voisinage(resultChild, city1, city2,"swap");
+		}
+		return resultChild;
+	}
 
 	/**
 	 * Calcul des distances entre les points des différentes villes
@@ -638,6 +661,22 @@ public class MainAdom {
 		ArrayList<Integer> random = initialisation(matrixInHashMap, "random","", 0);
 		System.out.println("Random list : " + evaluateDistances(random, matrixInHashMap));
 		System.out.println(random);
+
+		System.out.println("========================================================================");
+		
+		ArrayList<Integer> random2 = initialisation(matrixInHashMap, "random","", 0);
+		ArrayList<Integer> random2Tmp = new ArrayList<Integer>();
+		for (int i = 0; i < random2.size(); i++) {
+			random2Tmp.add(random2.get(i));
+		}
+		System.out.println("Random list 2 : " + evaluateDistances(random2, matrixInHashMap));
+		System.out.println(random2);
+		random2 = mutation(random2, 10);
+		System.out.println("Random list 2  (après la mutation, 10%): " + evaluateDistances(random2, matrixInHashMap));
+		System.out.println(random2);
+		random2Tmp = mutation(random2Tmp, 30);
+		System.out.println("Random list 2  (après la mutation, 30%): " + evaluateDistances(random2Tmp, matrixInHashMap));
+		System.out.println(random2Tmp);
 
 		System.out.println("========================================================================");
 
