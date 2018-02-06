@@ -449,11 +449,11 @@ public class MainAdom {
 			segmentParent1.add(parent1.get(i));
 		}
 		
-		System.out.println(frag1 + " : " + frag2);
-		System.out.println(parent1);
-		System.out.println(segmentParent1);
+		//System.out.println(frag1 + " : " + frag2);
+		//System.out.println(parent1);
+		//System.out.println(segmentParent1);
 		
-		System.out.println("parent 2 : " + parent2);
+		//System.out.println("parent 2 : " + parent2);
 		fragTmp = 0;
 		boolean reversed = false;
 		if(parent2.indexOf(frag1)>parent2.indexOf(frag2)) {
@@ -490,8 +490,8 @@ public class MainAdom {
 				}
 			}
 		}
-		System.out.println(segmentDebut);
-		System.out.println(segmentFin);
+		//System.out.println(segmentDebut);
+		//System.out.println(segmentFin);
 		
 		ArrayList<Integer> availableCities = new ArrayList<Integer>();
 		for (int i = 0; i < 100; i++) {
@@ -499,7 +499,7 @@ public class MainAdom {
 				availableCities.add(i);
 			}
 		}
-		System.out.println("available Cities : " + availableCities);
+		//System.out.println("available Cities : " + availableCities);
 		ArrayList<Integer> finalListCities = new ArrayList<Integer>();
 		int min = 0;
 		int starter = 0;
@@ -557,17 +557,18 @@ public class MainAdom {
 			prodigalChild.add(finalListCities.get(i));
 		}
 		
+		//System.out.println(distances);
 		int maxDistance = 0;
 		for (Integer distance : distances) {
 			if(maxDistance<distance) {
 				maxDistance=distance;
 			}
 		}
-		if(evaluateDistances(prodigalChild, matrixInHashMap)<evaluateDistances(newWorldPopulation.get(distances.indexOf(maxDistance)+1), matrixInHashMap)) {
+		//System.out.println(evaluateDistances(newWorldPopulation.get(distances.indexOf(maxDistance)), matrixInHashMap) + " (maxdistance)");
+		if(evaluateDistances(prodigalChild, matrixInHashMap)<evaluateDistances(newWorldPopulation.get(distances.indexOf(maxDistance)), matrixInHashMap)) {
 			if(!newWorldPopulation.contains(prodigalChild))
 				newWorldPopulation.set(distances.indexOf(maxDistance), prodigalChild);
 		}
-		
 		System.out.println(evaluateDistances(prodigalChild, matrixInHashMap) + " : " + prodigalChild);
 		seeWorldPopulation(newWorldPopulation, matrixInHashMap);
 		
