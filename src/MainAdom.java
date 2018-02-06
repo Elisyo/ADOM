@@ -46,7 +46,7 @@ public class MainAdom {
 		}
 		return datas;
 	}
-	
+
 	/**
 	 * Génération de la matrice par une HashMap : (ville, [distance entre cette ville et les autres])
 	 * @param datas
@@ -79,7 +79,7 @@ public class MainAdom {
 			System.out.println("ville "+ i + " : " + MatrixInHashMap.get(i));
 		}
 	}
-	
+
 	/**
 	 * Permet de visualiser notre population mondiale
 	 * @param worldPopulation
@@ -397,7 +397,7 @@ public class MainAdom {
 
 		return listCities;
 	}
-	
+
 	/**
 	 * Parmi la population, sélectionner 2 parents (ceux avec les meilleurs résultats)
 	 * Se servir du 1er parent en sélectionnant un segment entre 2 villes choisies aléatoirement
@@ -414,7 +414,7 @@ public class MainAdom {
 			newWorldPopulation.add(worldPopulation.get(i));
 			distances.add(evaluateDistances(newWorldPopulation.get(i),matrixInHashMap));
 		}
-		
+
 		int minDistance1=distances.get(0);
 		for (Integer distance : distances) {
 			if(distance<minDistance1) {
@@ -429,9 +429,9 @@ public class MainAdom {
 		}
 		ArrayList<Integer> parent1 = newWorldPopulation.get(distances.indexOf(minDistance1));
 		ArrayList<Integer> parent2 = newWorldPopulation.get(distances.indexOf(minDistance2));
-		
+
 		seeWorldPopulation(newWorldPopulation, matrixInHashMap);
-		
+
 		int frag1 = (int) (Math.random()*100-1);
 		int frag2 = (int) (Math.random()*100-1);
 		while(frag1==frag2) {
@@ -443,16 +443,16 @@ public class MainAdom {
 			frag1 = frag2;
 			frag2 = fragTmp;
 		}
-		
+
 		ArrayList<Integer> segmentParent1 = new ArrayList<Integer>();
 		for (int i = parent1.indexOf(frag1); i <= parent1.indexOf(frag2); i++) {
 			segmentParent1.add(parent1.get(i));
 		}
-		
+
 		//System.out.println(frag1 + " : " + frag2);
 		//System.out.println(parent1);
 		//System.out.println(segmentParent1);
-		
+
 		//System.out.println("parent 2 : " + parent2);
 		fragTmp = 0;
 		boolean reversed = false;
@@ -462,17 +462,17 @@ public class MainAdom {
 			frag2 = fragTmp;
 			reversed = true;
 		}
-		
+
 		ArrayList<Integer> alreadyTakenCities = new ArrayList<Integer>();
 		for (int i = 0; i < segmentParent1.size(); i++) {
 			if(!alreadyTakenCities.contains(segmentParent1.get(i))) {
 				alreadyTakenCities.add(segmentParent1.get(i));
 			}
 		}
-		
+
 		ArrayList<Integer> segmentDebut = new ArrayList<Integer>();
 		ArrayList<Integer> segmentFin = new ArrayList<Integer>();
-		
+
 		if(parent2.indexOf(frag1)!=0) {
 			for (int i = 0; i < parent2.indexOf(frag1); i++) {
 				if(!alreadyTakenCities.contains(parent2.get(i))) {
@@ -481,7 +481,7 @@ public class MainAdom {
 				}
 			}
 		}
-		
+
 		if(parent2.indexOf(frag2)!=parent2.size()-1) {
 			for (int i = parent2.indexOf(frag2)+1; i < parent2.size(); i++) {
 				if(!alreadyTakenCities.contains(parent2.get(i))) {
@@ -492,7 +492,7 @@ public class MainAdom {
 		}
 		//System.out.println(segmentDebut);
 		//System.out.println(segmentFin);
-		
+
 		ArrayList<Integer> availableCities = new ArrayList<Integer>();
 		for (int i = 0; i < 100; i++) {
 			if(!alreadyTakenCities.contains(i)) {
@@ -556,7 +556,7 @@ public class MainAdom {
 		for (int i = 0; i < finalListCities.size(); i++) {
 			prodigalChild.add(finalListCities.get(i));
 		}
-		
+
 		//System.out.println(distances);
 		int maxDistance = 0;
 		for (Integer distance : distances) {
@@ -571,10 +571,10 @@ public class MainAdom {
 		}
 		System.out.println(evaluateDistances(prodigalChild, matrixInHashMap) + " : " + prodigalChild);
 		seeWorldPopulation(newWorldPopulation, matrixInHashMap);
-		
+
 		return newWorldPopulation;
 	}
-	
+
 	/**
 	 * Mutation selon un taux donné
 	 * @param actualChild
@@ -633,7 +633,10 @@ public class MainAdom {
 		return somme;
 	}
 
-	public static void main(String [] args) {
+	/**
+	 * Cas de tests pour des critères simples
+	 */
+	private static void singleCritere() {
 		ArrayList<Data> datas_kroA100 = parseFile("kroA100.tsp");
 		HashMap<Integer, ArrayList<Integer>> matrixInHashMap = generateMatrixInHashMap(datas_kroA100);
 
@@ -664,7 +667,7 @@ public class MainAdom {
 		System.out.println(random);
 
 		System.out.println("========================================================================");
-		
+
 		ArrayList<Integer> random2 = initialisation(matrixInHashMap, "random","", 0);
 		ArrayList<Integer> random2Tmp = new ArrayList<Integer>();
 		for (int i = 0; i < random2.size(); i++) {
@@ -692,6 +695,126 @@ public class MainAdom {
 		ArrayList<ArrayList<Integer>> worldPopulation = initialisationPopulation(matrixInHashMap, 10, "mouvement", "heuristic", 0);
 
 		worldPopulation = orderBasedCrossover(worldPopulation, matrixInHashMap);
+	}
+
+	/**
+	 * Coût pondéré entre A et B 
+	 * @param list
+	 * @param matrixA
+	 * @param matrixB
+	 * @return
+	 */
+	private static int qualityOfPermutation(ArrayList<Integer> list,HashMap<Integer, ArrayList<Integer>> matrixA,HashMap<Integer, ArrayList<Integer>> matrixB) {
+		int costA = evaluateDistances(list, matrixA);
+		int costB = evaluateDistances(list, matrixB);
+		return (costA+costB)/2;
+	}
+
+	/**
+	 * @param population
+	 * @param options : offline OR online
+	 * @return
+	 */
+	private static ArrayList<MultiData> filterNonDominated(ArrayList<MultiData> population,String options){
+		ArrayList<MultiData> dominated = new ArrayList<MultiData>();
+		for (int i = 0; i < population.size(); i++) {
+			dominated.add(population.get(i));
+		}
+		ArrayList<MultiData> non_dominated = new ArrayList<MultiData>();
+		boolean dominant = false;
+		ArrayList<MultiData> dominion = new ArrayList<MultiData>();
+		for (int i = 0; i < population.size(); i++) {
+			if(non_dominated.isEmpty()) {
+				non_dominated.add(dominated.get(i));
+			} else {
+				dominion.clear();
+				for (MultiData multiData : non_dominated) {
+					if(multiData.costA>dominated.get(i).costA) {
+						System.out.println(i+" : cout A dominant");
+						dominant = true;
+					}
+					if(multiData.costB>dominated.get(i).costB) {
+						System.out.println(i+" : cout B dominant");
+						dominant = true;
+					}
+					if(multiData.costA>dominated.get(i).costA && multiData.costB>dominated.get(i).costB) {
+						System.out.println(i+" : archi dominant");
+						dominant = true;
+						dominion.add(multiData);
+					}
+				}
+				if(dominant) {
+					if(!non_dominated.contains(dominated.get(i))) {
+						non_dominated.add(dominated.get(i));
+					}
+				}
+				if(dominion.size()!=0) {
+					for (MultiData multiData : dominion) {
+						non_dominated.remove(multiData);
+					}
+				}
+			}
+		}
 		
+		
+		
+		
+		/*
+		for (int i = 0;i < population.size(); i++) {
+			for(int j = 0;j < population.size();j++) {
+				if(dominated.get(i).costA > dominated.get(j).costA) {
+					if(dominated.get(i).costB > dominated.get(j).costB) {
+						if(!non_dominated.contains(dominated.get(i))) {
+							non_dominated.add(dominated.get(i));
+							dominated.remove(dominated.get(i));
+						}
+					}else{
+						if(!non_dominated.contains(dominated.get(i))) {
+							non_dominated.add(dominated.get(i));
+							dominated.remove(dominated.get(i));
+						}
+					}
+				}else{
+					if(dominated.get(i).costB > dominated.get(j).costB) {
+						if(!non_dominated.contains(dominated.get(i))) {
+							non_dominated.add(dominated.get(i));
+							dominated.remove(dominated.get(i));
+						}
+					}
+				}
+			}
+		}
+		*/
+		
+		System.out.println("Liste de non-dominés ("+non_dominated.size()+")" + non_dominated);
+		return non_dominated;
+	}
+	/**
+	 * Cas de tests pour des critères multiples
+	 */
+	private static void multiCritere() {
+		ArrayList<Data> datas_kroA100 = parseFile("kroA100.tsp");
+		ArrayList<Data> datas_kroB100 = parseFile("kroB100.tsp");
+		HashMap<Integer, ArrayList<Integer>> matrixA = generateMatrixInHashMap(datas_kroA100);
+		HashMap<Integer, ArrayList<Integer>> matrixB = generateMatrixInHashMap(datas_kroB100);
+
+		ArrayList<MultiData> randomPopulation = new ArrayList<MultiData>();
+		for (int i = 0; i < 10; i++) {
+			MultiData tmp = new MultiData(randomList());
+			tmp.setCostA(evaluateDistances(tmp.getCities(), matrixA));
+			tmp.setCostB(evaluateDistances(tmp.getCities(), matrixB));
+			randomPopulation.add(tmp);
+		}
+		for (int i = 0; i < randomPopulation.size(); i++) {
+			randomPopulation.get(i).setCostPonderate(qualityOfPermutation(randomPopulation.get(i).getCities(), matrixA, matrixB));
+			System.out.println("Coût pondéré entre A et B  (iteration "+i+") : "+ randomPopulation.get(i).costPonderate +" (avec A :" + randomPopulation.get(i).getCostA()+" et B :" + randomPopulation.get(i).getCostB()+")");
+		}
+
+		filterNonDominated(randomPopulation, "offline");
+	}
+
+	public static void main(String [] args) {
+		//singleCritere();
+		multiCritere();
 	}
 }
