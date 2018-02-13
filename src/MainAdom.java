@@ -716,79 +716,131 @@ public class MainAdom {
 	 * @return
 	 */
 	private static ArrayList<MultiData> filterNonDominated(ArrayList<MultiData> population,String options){
-		ArrayList<MultiData> dominated = new ArrayList<MultiData>();
-		for (int i = 0; i < population.size(); i++) {
-			dominated.add(population.get(i));
-		}
 		ArrayList<MultiData> non_dominated = new ArrayList<MultiData>();
-		boolean dominant = false;
-		ArrayList<MultiData> dominion = new ArrayList<MultiData>();
-		for (int i = 0; i < population.size(); i++) {
-			if(non_dominated.isEmpty()) {
-				non_dominated.add(dominated.get(i));
-			} else {
-				dominion.clear();
-				for (MultiData multiData : non_dominated) {
-					if(multiData.costA>dominated.get(i).costA) {
-						System.out.println(i+" : cout A dominant");
-						dominant = true;
-					}
-					if(multiData.costB>dominated.get(i).costB) {
-						System.out.println(i+" : cout B dominant");
-						dominant = true;
-					}
-					if(multiData.costA>dominated.get(i).costA && multiData.costB>dominated.get(i).costB) {
-						System.out.println(i+" : archi dominant");
-						dominant = true;
-						dominion.add(multiData);
-					}
-				}
-				if(dominant) {
-					if(!non_dominated.contains(dominated.get(i))) {
-						non_dominated.add(dominated.get(i));
-					}
-				}
-				if(dominion.size()!=0) {
-					for (MultiData multiData : dominion) {
-						non_dominated.remove(multiData);
-					}
-				}
+		switch (options) {
+		case "offline":
+			non_dominated = offline(population);
+			break;
+		case "online":
+			for (int i = 0; i < population.size(); i++) {
+				non_dominated = online(population.get(i), non_dominated);
 			}
+			break;
+		default:
+			break;
 		}
-		
-		
-		
-		
-		/*
-		for (int i = 0;i < population.size(); i++) {
-			for(int j = 0;j < population.size();j++) {
-				if(dominated.get(i).costA > dominated.get(j).costA) {
-					if(dominated.get(i).costB > dominated.get(j).costB) {
-						if(!non_dominated.contains(dominated.get(i))) {
-							non_dominated.add(dominated.get(i));
-							dominated.remove(dominated.get(i));
-						}
-					}else{
-						if(!non_dominated.contains(dominated.get(i))) {
-							non_dominated.add(dominated.get(i));
-							dominated.remove(dominated.get(i));
-						}
-					}
-				}else{
-					if(dominated.get(i).costB > dominated.get(j).costB) {
-						if(!non_dominated.contains(dominated.get(i))) {
-							non_dominated.add(dominated.get(i));
-							dominated.remove(dominated.get(i));
-						}
-					}
-				}
-			}
+		System.out.println("Liste de non-dominés ("+non_dominated.size()+")");
+		for (int j = 0; j < non_dominated.size(); j++) {
+			System.out.println(non_dominated.get(j));
 		}
-		*/
-		
-		System.out.println("Liste de non-dominés ("+non_dominated.size()+")" + non_dominated);
 		return non_dominated;
 	}
+
+	/**
+	 * Offline car on prend toute la population d'un coup
+	 * @param population
+	 * @return
+	 */
+	private static ArrayList<MultiData> offline(ArrayList<MultiData> population){
+		ArrayList<MultiData> non_dominated = new ArrayList<MultiData>();
+		ArrayList<MultiData> toBeDeleted = new ArrayList<MultiData>();
+		ArrayList<MultiData> toBeAdded = new ArrayList<MultiData>();
+		boolean alreadyDominated = false;
+		for (int i = 0; i < population.size(); i++) {
+			if(non_dominated.isEmpty()) {
+				non_dominated.add(population.get(i));
+			} else {
+				for (MultiData nd : non_dominated) {
+					if(!alreadyDominated)
+						if(!toBeDeleted.contains(population.get(i)) && !non_dominated.contains(population.get(i)) && population.get(i).getCostA()<nd.getCostA() && population.get(i).getCostB()<nd.getCostB()) {
+							toBeAdded.add(population.get(i));
+							toBeDeleted.add(nd);
+							//System.out.println(i +" : archi dominant");
+							//System.out.println(population.get(i) + " sur " + nd);
+						} else if(!toBeDeleted.contains(population.get(i)) && !non_dominated.contains(population.get(i)) && population.get(i).getCostA()>nd.getCostA() && population.get(i).getCostB()>nd.getCostB()) {
+							alreadyDominated = true;
+							if(toBeAdded.contains(population.get(i))){
+								toBeAdded.remove(population.get(i));
+							}
+							//System.out.println(i +" : archi dominé");
+						}else if(!toBeAdded.contains(population.get(i)) && !non_dominated.contains(population.get(i)) && population.get(i).getCostA()<nd.getCostA()) {
+							toBeAdded.add(population.get(i));
+							//System.out.println(i +" : dominant A");
+						} else if(!toBeAdded.contains(population.get(i)) && !non_dominated.contains(population.get(i)) && population.get(i).getCostB()<nd.getCostB()) {
+							toBeAdded.add(population.get(i));
+							//System.out.println(i +" : dominant B");
+						}
+				}
+				int sizeToBeAdded = toBeAdded.size();
+				for (int j = 0; j < sizeToBeAdded; j++) {
+					//System.out.println("pret a etre ajouter");
+					if(!non_dominated.contains(toBeAdded.get(j)))
+						non_dominated.add(toBeAdded.get(j));
+				}
+				toBeAdded.clear();
+				int sizeToBeDeleted = toBeDeleted.size();
+				for (int j = 0; j < sizeToBeDeleted; j++) {
+					non_dominated.remove(toBeDeleted.get(j));
+				}
+				toBeDeleted.clear();
+				alreadyDominated = false;
+			}
+		}
+		return non_dominated;
+	}
+
+	/**
+	 * 
+	 * @param md
+	 * @param non_dominated
+	 * @return
+	 */
+	private static ArrayList<MultiData> online(MultiData md, ArrayList<MultiData> non_dominated){
+		ArrayList<MultiData> toBeDeleted = new ArrayList<MultiData>();
+		ArrayList<MultiData> toBeAdded = new ArrayList<MultiData>();
+		boolean alreadyDominated = false;
+
+		if(non_dominated.isEmpty()) {
+			non_dominated.add(md);
+		} else {
+			for (MultiData nd : non_dominated) {
+				if(!alreadyDominated)
+					if(!toBeDeleted.contains(md) && !non_dominated.contains(md) && md.getCostA()<nd.getCostA() && md.getCostB()<nd.getCostB()) {
+						toBeAdded.add(md);
+						toBeDeleted.add(nd);
+						//System.out.println(i +" : archi dominant");
+						//System.out.println(population.get(i) + " sur " + nd);
+					} else if(!toBeDeleted.contains(md) && !non_dominated.contains(md) && md.getCostA()>nd.getCostA() && md.getCostB()>nd.getCostB()) {
+						alreadyDominated = true;
+						if(toBeAdded.contains(md)){
+							toBeAdded.remove(md);
+						}
+						//System.out.println(i +" : archi dominé");
+					}else if(!toBeAdded.contains(md) && !non_dominated.contains(md) && md.getCostA()<nd.getCostA()) {
+						toBeAdded.add(md);
+						//System.out.println(i +" : dominant A");
+					} else if(!toBeAdded.contains(md) && !non_dominated.contains(md) && md.getCostB()<nd.getCostB()) {
+						toBeAdded.add(md);
+						//System.out.println(i +" : dominant B");
+					}
+			}
+			int sizeToBeAdded = toBeAdded.size();
+			for (int j = 0; j < sizeToBeAdded; j++) {
+				//System.out.println("pret a etre ajouter");
+				if(!non_dominated.contains(toBeAdded.get(j)))
+					non_dominated.add(toBeAdded.get(j));
+			}
+			toBeAdded.clear();
+			int sizeToBeDeleted = toBeDeleted.size();
+			for (int j = 0; j < sizeToBeDeleted; j++) {
+				non_dominated.remove(toBeDeleted.get(j));
+			}
+			toBeDeleted.clear();
+			alreadyDominated = false;
+		}
+		return non_dominated;
+	}
+
 	/**
 	 * Cas de tests pour des critères multiples
 	 */
@@ -799,7 +851,7 @@ public class MainAdom {
 		HashMap<Integer, ArrayList<Integer>> matrixB = generateMatrixInHashMap(datas_kroB100);
 
 		ArrayList<MultiData> randomPopulation = new ArrayList<MultiData>();
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 500; i++) {
 			MultiData tmp = new MultiData(randomList());
 			tmp.setCostA(evaluateDistances(tmp.getCities(), matrixA));
 			tmp.setCostB(evaluateDistances(tmp.getCities(), matrixB));
@@ -810,7 +862,10 @@ public class MainAdom {
 			System.out.println("Coût pondéré entre A et B  (iteration "+i+") : "+ randomPopulation.get(i).costPonderate +" (avec A :" + randomPopulation.get(i).getCostA()+" et B :" + randomPopulation.get(i).getCostB()+")");
 		}
 
+		System.out.println("offline");
 		filterNonDominated(randomPopulation, "offline");
+		System.out.println("online");
+		filterNonDominated(randomPopulation, "online");
 	}
 
 	public static void main(String [] args) {
