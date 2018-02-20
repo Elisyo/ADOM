@@ -50,7 +50,7 @@ public class MainAdom {
 		}
 		return datas;
 	}
-	
+
 	/**
 	 * Fonction permettant de stocker nos résultats, elle sera uniquement utilisée pour la partie "SingleCritere"
 	 * @param originFile
@@ -66,14 +66,50 @@ public class MainAdom {
 			FileWriter ffw=new FileWriter(ff);
 			ffw.write(evaluateDistances(city, matrixInHashMap)+"");  // écrire une ligne dans le fichier name/num.txt
 			ffw.close(); // fermer le fichier à la fin des traitements
-			
+
 			ff=new File(path+"/resources/"+name+"/"+originFile+"_listCities_"+num+".txt"); // définir l'arborescence
 			ff.createNewFile();
 			ffw=new FileWriter(ff);
 			ffw.write(city+"");
 			ffw.close(); // fermer le fichier à la fin des traitements
 		} catch (Exception e) {
-			
+
+		}
+	}
+
+	/**
+	 * Fonction permettant de stocker nos résultats, elle sera uniquement utilisée pour la partie "Order Based Cross-Over"
+	 * @param originFile
+	 * @param name
+	 * @param num
+	 * @param city
+	 */
+	private static void putInFileOrderBasedCrossover (String originFile,String name,int num, ArrayList<ArrayList<Integer>> worldPopulation){
+		try{
+			String path=new File("").getAbsolutePath();
+			File ff=new File(path+"/resources/"+name+"/"+originFile+"_distance_"+num+".txt"); // définir l'arborescence
+			ff.createNewFile();
+			FileWriter ffw=new FileWriter(ff);
+			for (int i = 0; i < worldPopulation.size(); i++) {
+				ffw.write(evaluateDistances(worldPopulation.get(i), matrixInHashMap)+"");  // écrire une ligne dans le fichier name/num.txt
+				if(i!=worldPopulation.size()-1) {
+					ffw.write("\n"); // retour à la ligne
+				}
+			}
+			ffw.close(); // fermer le fichier à la fin des traitements
+
+			ff=new File(path+"/resources/"+name+"/"+originFile+"_listCities_"+num+".txt"); // définir l'arborescence
+			ff.createNewFile();
+			ffw=new FileWriter(ff);
+			for (int i = 0; i < worldPopulation.size(); i++) {
+				ffw.write(worldPopulation.get(i)+"");  // écrire une ligne dans le fichier name/num.txt
+				if(i!=worldPopulation.size()-1) {
+					ffw.write("\n"); // retour à la ligne
+				}
+			}
+			ffw.close(); // fermer le fichier à la fin des traitements
+		} catch (Exception e) {
+
 		}
 	}
 
@@ -642,7 +678,7 @@ public class MainAdom {
 		for (int i = 0; i < order.size()-1; i++) {
 			somme = somme + matrixInHashMap.get(order.get(i)).get(order.get(i+1));
 		}
-		
+
 		// bouclement du circuit
 		somme = somme + matrixInHashMap.get(starter).get(last);
 
@@ -666,7 +702,7 @@ public class MainAdom {
 		System.out.println(heuristicFromFirstCity);
 		putInFileSingleCritere("kroA","HeuristicFromFirstCity", 1, heuristicFromFirstCity);
 		System.out.println("========================================================================");
-		
+
 		for (int i = 1; i < 16; i++) {
 			ArrayList<Integer> voisinageSwapBetweenFirstAndSecondCity = voisinage(initialisation(matrixInHashMap, "mouvement", "heuristic", 0), 0, i,"swap");
 			System.out.println("Swap entre la 1ère ville et la "+(i+1)+"ème : " + evaluateDistances(voisinageSwapBetweenFirstAndSecondCity,matrixInHashMap));
@@ -677,10 +713,10 @@ public class MainAdom {
 				System.out.println("------------------------------------------------------------------------");
 			}
 		}
-		
+
 		System.out.println("========================================================================");
-		
-		
+
+
 		for (int i = 1; i < 16; i++) {
 			ArrayList<Integer> voisinageTwoOptBetweenFirstAndSecondCity = voisinage(initialisation(matrixInHashMap, "mouvement", "heuristic", 0), 0, i,"two-opt");
 			System.out.println("Two-opt entre la 1ère ville et la "+(i+1)+"ème : " + evaluateDistances(voisinageTwoOptBetweenFirstAndSecondCity,matrixInHashMap));
@@ -691,14 +727,24 @@ public class MainAdom {
 				System.out.println("------------------------------------------------------------------------");
 			}
 		}
-		
+
 		System.out.println("========================================================================");
-		*/
-		
+		 */
+
+		/*
+		for (int j = 0; j < 30; j++) {
+			ArrayList<Integer> heuristic = initialisation(matrixInHashMap, "mouvement", "heuristic", j);
+			System.out.println("Solution à partir de la "+j+"ème ville: " + evaluateDistances(heuristic,matrixInHashMap));
+			System.out.println(heuristic);
+			putInFileSingleCritere("kroA","Heuristic", j, heuristic);
+			System.out.println("========================================================================");
+		}
+
+
 		System.out.println("Best heuristic : " + bestHeuristic(matrixInHashMap));
 
 		System.out.println("========================================================================");
-		
+		 */
 		/*
 		for (int i = 1; i < 31; i++) {
 			ArrayList<Integer> random = initialisation(matrixInHashMap, "random","", 0);
@@ -712,35 +758,46 @@ public class MainAdom {
 		}
 
 		System.out.println("========================================================================");
-		*/
-		
-		ArrayList<Integer> random2 = initialisation(matrixInHashMap, "random","", 0);
-		ArrayList<Integer> random2Tmp = new ArrayList<Integer>();
-		for (int i = 0; i < random2.size(); i++) {
-			random2Tmp.add(random2.get(i));
+		 */
+
+		/*
+		for (int j = 1; j < 31; j++) {
+			ArrayList<Integer> random2 = initialisation(matrixInHashMap, "random","", 0);
+			ArrayList<Integer> random2Tmp = new ArrayList<Integer>();
+			for (int i = 0; i < random2.size(); i++) {
+				random2Tmp.add(random2.get(i));
+			}
+			putInFileSingleCritere("kroA","Mutation", j, random2);
+			System.out.println("Random list 2 : " + evaluateDistances(random2, matrixInHashMap));
+			System.out.println(random2);
+			random2 = mutation(random2, 10);
+			putInFileSingleCritere("kroA","Mutation/10", j, random2);
+			System.out.println("Random list 2  (après la mutation, 10%): " + evaluateDistances(random2, matrixInHashMap));
+			System.out.println(random2);
+			random2Tmp = mutation(random2Tmp, 30);
+			putInFileSingleCritere("kroA","Mutation/30", j, random2Tmp);
+			System.out.println("Random list 2  (après la mutation, 30%): " + evaluateDistances(random2Tmp, matrixInHashMap));
+			System.out.println(random2Tmp);
 		}
-		System.out.println("Random list 2 : " + evaluateDistances(random2, matrixInHashMap));
-		System.out.println(random2);
-		random2 = mutation(random2, 10);
-		System.out.println("Random list 2  (après la mutation, 10%): " + evaluateDistances(random2, matrixInHashMap));
-		System.out.println(random2);
-		random2Tmp = mutation(random2Tmp, 30);
-		System.out.println("Random list 2  (après la mutation, 30%): " + evaluateDistances(random2Tmp, matrixInHashMap));
-		System.out.println(random2Tmp);
 
 		System.out.println("========================================================================");
+		 */
 
+		
 		ArrayList<Integer> semiHeuristicFromFirstCity = initialisation(matrixInHashMap, "mouvement", "semi-heuristic", 0);
 		System.out.println("Solution semi-heuristique à partir de la 1ère ville: " + evaluateDistances(semiHeuristicFromFirstCity,matrixInHashMap));
 		System.out.println(semiHeuristicFromFirstCity);
-
+		/*
 		System.out.println("========================================================================");
 		System.out.println("=======================TP 3 : algorithme genetique======================");
 		System.out.println("========================================================================");
 
 		ArrayList<ArrayList<Integer>> worldPopulation = initialisationPopulation(matrixInHashMap, 10, "mouvement", "heuristic", 0);
 
-		worldPopulation = orderBasedCrossover(worldPopulation, matrixInHashMap);
+		for (int i = 0; i < 10; i++) {
+			worldPopulation = orderBasedCrossover(worldPopulation, matrixInHashMap);
+			putInFileOrderBasedCrossover("kroA", "OrderBased", i, worldPopulation);
+		}*/
 	}
 
 	/**
