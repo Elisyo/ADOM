@@ -60,13 +60,13 @@ public class MainAdom {
 	private static void putInFileSingleCritere (String originFile,String name, int num, ArrayList<Integer> city){
 		try{
 			String path=new File("").getAbsolutePath();
-			File ff=new File(path+"/resources/"+name+"/"+originFile+"_"+num+"_distance.txt"); // définir l'arborescence
+			File ff=new File(path+"/resources/"+name+"/"+originFile+"_distance_"+num+".txt"); // définir l'arborescence
 			ff.createNewFile();
 			FileWriter ffw=new FileWriter(ff);
 			ffw.write(evaluateDistances(city, matrixInHashMap)+"");  // écrire une ligne dans le fichier name/num.txt
 			ffw.close(); // fermer le fichier à la fin des traitements
 			
-			ff=new File(path+"/resources/"+name+"/"+originFile+"_"+num+"_listCities.txt"); // définir l'arborescence
+			ff=new File(path+"/resources/"+name+"/"+originFile+"_listCities_"+num+".txt"); // définir l'arborescence
 			ff.createNewFile();
 			ffw=new FileWriter(ff);
 			ffw.write(city+"");
@@ -663,8 +663,7 @@ public class MainAdom {
 		System.out.println(heuristicFromFirstCity);
 		putInFileSingleCritere("kroA","HeuristicFromFirstCity", 1, heuristicFromFirstCity);
 		System.out.println("========================================================================");
-		*/
-		/*
+		
 		for (int i = 1; i < 16; i++) {
 			ArrayList<Integer> voisinageSwapBetweenFirstAndSecondCity = voisinage(initialisation(matrixInHashMap, "mouvement", "heuristic", 0), 0, i,"swap");
 			System.out.println("Swap entre la 1ère ville et la "+(i+1)+"ème : " + evaluateDistances(voisinageSwapBetweenFirstAndSecondCity,matrixInHashMap));
@@ -677,8 +676,8 @@ public class MainAdom {
 		}
 		
 		System.out.println("========================================================================");
-		 */
-		/*
+		
+		
 		for (int i = 1; i < 16; i++) {
 			ArrayList<Integer> voisinageTwoOptBetweenFirstAndSecondCity = voisinage(initialisation(matrixInHashMap, "mouvement", "heuristic", 0), 0, i,"two-opt");
 			System.out.println("Two-opt entre la 1ère ville et la "+(i+1)+"ème : " + evaluateDistances(voisinageTwoOptBetweenFirstAndSecondCity,matrixInHashMap));
