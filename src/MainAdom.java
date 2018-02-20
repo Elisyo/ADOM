@@ -338,7 +338,7 @@ public class MainAdom {
 			if(solutions.get(i)<min) {
 				min = solutions.get(i);
 			}
-		}		
+		}
 		return min;
 	}
 
@@ -638,24 +638,10 @@ public class MainAdom {
 		int starter = order.get(0);
 		int last = order.get(order.size()-1);
 
-		ArrayList<Integer> currentCities = new ArrayList<Integer>();
-
-		for (int i = 0; i < order.size(); i++) {
-			currentCities.add(order.get(i));
+		for (int i = 0; i < order.size()-1; i++) {
+			somme = somme + matrixInHashMap.get(order.get(i)).get(order.get(i+1));
 		}
-
-		while(currentCities.size()>0) {
-			int min = 100000000;
-			for (int i = 0; i < currentCities.size(); i++) {
-				if(min>matrixInHashMap.get(currentCities.get(0)).get(i) && matrixInHashMap.get(currentCities.get(0)).get(i)!=0) {
-					min = matrixInHashMap.get(currentCities.get(0)).get(i);
-				}
-			}
-			if(min!=100000000) {
-				somme = somme + min;
-				currentCities.remove(0);
-			}
-		}
+		
 		// bouclement du circuit
 		somme = somme + matrixInHashMap.get(starter).get(last);
 
@@ -710,13 +696,22 @@ public class MainAdom {
 		System.out.println("Best heuristic : " + bestHeuristic(matrixInHashMap));
 
 		System.out.println("========================================================================");
+		
+		/*
+		for (int i = 1; i < 31; i++) {
+			ArrayList<Integer> random = initialisation(matrixInHashMap, "random","", 0);
+			System.out.println("Random list : " + evaluateDistances(random, matrixInHashMap));
+			System.out.println(random);
 
-		ArrayList<Integer> random = initialisation(matrixInHashMap, "random","", 0);
-		System.out.println("Random list : " + evaluateDistances(random, matrixInHashMap));
-		System.out.println(random);
+			putInFileSingleCritere("kroA","Random", i, random);
+			if(i!=15) {
+				System.out.println("------------------------------------------------------------------------");
+			}
+		}
 
 		System.out.println("========================================================================");
-
+		*/
+		
 		ArrayList<Integer> random2 = initialisation(matrixInHashMap, "random","", 0);
 		ArrayList<Integer> random2Tmp = new ArrayList<Integer>();
 		for (int i = 0; i < random2.size(); i++) {
