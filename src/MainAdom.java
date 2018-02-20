@@ -15,6 +15,7 @@ import java.util.HashMap;
  */
 public class MainAdom {
 	static HashMap<Integer, ArrayList<Integer>> matrixInHashMap;
+	static HashMap<Integer, ArrayList<Integer>> matrixInHashMapB;
 
 	/**
 	 * Fonction qui parse le fichier donné en entrée et qui renvoie la liste composée des datas
@@ -653,7 +654,9 @@ public class MainAdom {
 	 */
 	private static void singleCritere() {
 		ArrayList<Data> datas_kroA100 = parseFile("kroA100.tsp");
+		ArrayList<Data> datas_kroB100 = parseFile("kroB100.tsp");
 		matrixInHashMap = generateMatrixInHashMap(datas_kroA100);
+		matrixInHashMapB = generateMatrixInHashMap(datas_kroB100);
 
 		//visualizeMatrixInHashMap(matrixInHashMap);
 
