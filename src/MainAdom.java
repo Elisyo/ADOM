@@ -1,8 +1,10 @@
 package src;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +14,7 @@ import java.util.HashMap;
  * @author clemence
  */
 public class MainAdom {
+	static HashMap<Integer, ArrayList<Integer>> matrixInHashMap;
 
 	/**
 	 * Fonction qui parse le fichier donné en entrée et qui renvoie la liste composée des datas
@@ -45,6 +48,32 @@ public class MainAdom {
 			e.printStackTrace();
 		}
 		return datas;
+	}
+	
+	/**
+	 * Fonction permettant de stocker nos résultats, elle sera uniquement utilisée pour la partie "SingleCritere"
+	 * @param originFile
+	 * @param name
+	 * @param num
+	 * @param city
+	 */
+	private static void putInFileSingleCritere (String originFile,String name, int num, ArrayList<Integer> city){
+		try{
+			String path=new File("").getAbsolutePath();
+			File ff=new File(path+"/resources/"+name+"/"+originFile+"_"+num+"_distance.txt"); // définir l'arborescence
+			ff.createNewFile();
+			FileWriter ffw=new FileWriter(ff);
+			ffw.write(evaluateDistances(city, matrixInHashMap)+"");  // écrire une ligne dans le fichier name/num.txt
+			ffw.close(); // fermer le fichier à la fin des traitements
+			
+			ff=new File(path+"/resources/"+name+"/"+originFile+"_"+num+"_listCities.txt"); // définir l'arborescence
+			ff.createNewFile();
+			ffw=new FileWriter(ff);
+			ffw.write(city+"");
+			ffw.close(); // fermer le fichier à la fin des traitements
+		} catch (Exception e) {
+			
+		}
 	}
 
 	/**
@@ -324,7 +353,7 @@ public class MainAdom {
 	private static ArrayList<Integer> voisinage(ArrayList<Integer> listCities, int a, int b, String options) {
 		switch (options) {
 		case "swap":
-			swap(listCities, a, b);
+			listCities = swap(listCities, a, b);
 			break;
 		case "two-opt":
 			listCities = two_opt(listCities, a, b);
@@ -638,26 +667,46 @@ public class MainAdom {
 	 */
 	private static void singleCritere() {
 		ArrayList<Data> datas_kroA100 = parseFile("kroA100.tsp");
-		HashMap<Integer, ArrayList<Integer>> matrixInHashMap = generateMatrixInHashMap(datas_kroA100);
+		matrixInHashMap = generateMatrixInHashMap(datas_kroA100);
 
 		//visualizeMatrixInHashMap(matrixInHashMap);
 
+		/*
 		ArrayList<Integer> heuristicFromFirstCity = initialisation(matrixInHashMap, "mouvement", "heuristic", 0);
 		System.out.println("Solution à partir de la 1ère ville: " + evaluateDistances(heuristicFromFirstCity,matrixInHashMap));
 		System.out.println(heuristicFromFirstCity);
-
+		putInFileSingleCritere("kroA","HeuristicFromFirstCity", 1, heuristicFromFirstCity);
 		System.out.println("========================================================================");
+		*/
+		/*
+		for (int i = 1; i < 16; i++) {
+			ArrayList<Integer> voisinageSwapBetweenFirstAndSecondCity = voisinage(initialisation(matrixInHashMap, "mouvement", "heuristic", 0), 0, i,"swap");
+			System.out.println("Swap entre la 1ère ville et la "+(i+1)+"ème : " + evaluateDistances(voisinageSwapBetweenFirstAndSecondCity,matrixInHashMap));
+			System.out.println(voisinageSwapBetweenFirstAndSecondCity);
 
-		System.out.println("Swap entre la 1ère ville et la 2ème : " + evaluateDistances(voisinage(heuristicFromFirstCity, 0, 1,"swap"),matrixInHashMap));
-		System.out.println(voisinage(initialisation(matrixInHashMap, "mouvement", "heuristic", 0), 0, 1,"swap"));
-
+			putInFileSingleCritere("kroA","Voisinage/Swap", i, voisinageSwapBetweenFirstAndSecondCity);
+			if(i!=15) {
+				System.out.println("------------------------------------------------------------------------");
+			}
+		}
+		
 		System.out.println("========================================================================");
+		 */
+		/*
+		for (int i = 1; i < 16; i++) {
+			ArrayList<Integer> voisinageTwoOptBetweenFirstAndSecondCity = voisinage(initialisation(matrixInHashMap, "mouvement", "heuristic", 0), 0, i,"two-opt");
+			System.out.println("Two-opt entre la 1ère ville et la "+(i+1)+"ème : " + evaluateDistances(voisinageTwoOptBetweenFirstAndSecondCity,matrixInHashMap));
+			System.out.println(voisinageTwoOptBetweenFirstAndSecondCity);
 
-		System.out.println("Two-opt entre la 1ère ville et la 2ème : " + evaluateDistances(voisinage(heuristicFromFirstCity, 0, 1,"two-opt"),matrixInHashMap));
-		System.out.println(voisinage(initialisation(matrixInHashMap, "mouvement", "heuristic", 0), 0, 1,"two-opt"));
-
+			putInFileSingleCritere("kroA","Voisinage/Two-opt", i, voisinageTwoOptBetweenFirstAndSecondCity);
+			if(i!=15) {
+				System.out.println("------------------------------------------------------------------------");
+			}
+		}
+		
 		System.out.println("========================================================================");
-
+		*/
+		
 		System.out.println("Best heuristic : " + bestHeuristic(matrixInHashMap));
 
 		System.out.println("========================================================================");
@@ -869,7 +918,7 @@ public class MainAdom {
 	}
 
 	public static void main(String [] args) {
-		//singleCritere();
-		multiCritere();
+		singleCritere();
+		//multiCritere();
 	}
 }
