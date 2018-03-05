@@ -78,6 +78,50 @@ public class MainAdom {
 	}
 
 	/**
+	 * Fonction permettant de stocker nos résultats, elle sera uniquement utilisée pour la partie "SingleCritere"
+	 * @param originFile
+	 * @param name
+	 * @param num
+	 * @param city
+	 */
+	private static void putInCSVFileDistance (String originFile,String name, ArrayList<Integer> listDistance){
+		try{
+			String path=new File("").getAbsolutePath();
+			File ff=new File(path+"/resources/"+name+"/"+originFile+"_distance.csv"); // définir l'arborescence
+			ff.createNewFile();
+			FileWriter ffw=new FileWriter(ff);
+			for (int i = 0; i < listDistance.size(); i++) {
+				ffw.write(listDistance.get(i)+"\n");  // écrire une ligne dans le fichier name/num.csv
+			}
+			ffw.close(); // fermer le fichier à la fin des traitements
+		} catch (Exception e) {
+
+		}
+	}
+	
+	/**
+	 * Fonction permettant de stocker nos résultats, elle sera uniquement utilisée pour la partie "SingleCritere"
+	 * @param originFile
+	 * @param name
+	 * @param num
+	 * @param city
+	 */
+	private static void putInCSVFileListCities (String originFile,String name, ArrayList<ArrayList<Integer>> listCities){
+		try{
+			String path=new File("").getAbsolutePath();
+			File ff=new File(path+"/resources/"+name+"/"+originFile+"_listCities.csv"); // définir l'arborescence
+			ff.createNewFile();
+			FileWriter ffw=new FileWriter(ff);
+			for (int i = 0; i < listCities.size(); i++) {
+				ffw.write(listCities.get(i)+"\n");  // écrire une ligne dans le fichier name/num.csv
+			}
+			ffw.close(); // fermer le fichier à la fin des traitements
+		} catch (Exception e) {
+
+		}
+	}
+	
+	/**
 	 * Fonction permettant de stocker nos résultats, elle sera uniquement utilisée pour la partie "Order Based Cross-Over"
 	 * @param originFile
 	 * @param name
@@ -702,20 +746,24 @@ public class MainAdom {
 		System.out.println(heuristicFromFirstCity);
 		putInFileSingleCritere("kroA","HeuristicFromFirstCity", 1, heuristicFromFirstCity);
 		System.out.println("========================================================================");
+*/
+		
+		ArrayList<Integer> resultatDistances = new ArrayList<Integer>();
+		ArrayList<ArrayList<Integer>> resultatListCities = new ArrayList<ArrayList<Integer>>();
 
-		for (int i = 1; i < 16; i++) {
+		for (int i = 1; i < 31; i++) {
 			ArrayList<Integer> voisinageSwapBetweenFirstAndSecondCity = voisinage(initialisation(matrixInHashMap, "mouvement", "heuristic", 0), 0, i,"swap");
 			System.out.println("Swap entre la 1ère ville et la "+(i+1)+"ème : " + evaluateDistances(voisinageSwapBetweenFirstAndSecondCity,matrixInHashMap));
 			System.out.println(voisinageSwapBetweenFirstAndSecondCity);
-
-			putInFileSingleCritere("kroA","Voisinage/Swap", i, voisinageSwapBetweenFirstAndSecondCity);
-			if(i!=15) {
-				System.out.println("------------------------------------------------------------------------");
-			}
+			resultatDistances.add(evaluateDistances(voisinageSwapBetweenFirstAndSecondCity,matrixInHashMap));
+			resultatListCities.add(voisinageSwapBetweenFirstAndSecondCity);
 		}
+		putInCSVFileDistance("kroA","Voisinage/Swap", resultatDistances);
+		putInCSVFileListCities("kroA","Voisinage/Swap", resultatListCities);
+		
 
 		System.out.println("========================================================================");
-
+/*
 
 		for (int i = 1; i < 16; i++) {
 			ArrayList<Integer> voisinageTwoOptBetweenFirstAndSecondCity = voisinage(initialisation(matrixInHashMap, "mouvement", "heuristic", 0), 0, i,"two-opt");
@@ -746,19 +794,16 @@ public class MainAdom {
 		System.out.println("========================================================================");
 		 */
 		/*
+		ArrayList<Integer> random = new ArrayList<Integer>();
 		for (int i = 1; i < 31; i++) {
-			ArrayList<Integer> random = initialisation(matrixInHashMap, "random","", 0);
-			System.out.println("Random list : " + evaluateDistances(random, matrixInHashMap));
-			System.out.println(random);
+			ArrayList<Integer> list = initialisation(matrixInHashMapB, "random","", 0);
+			random.add(evaluateDistances(list, matrixInHashMapB));
 
-			putInFileSingleCritere("kroA","Random", i, random);
-			if(i!=15) {
-				System.out.println("------------------------------------------------------------------------");
-			}
 		}
+		putInCSVFileDistance("kroB","Random", random);
 
 		System.out.println("========================================================================");
-		 */
+		*/
 
 		/*
 		for (int j = 1; j < 31; j++) {
