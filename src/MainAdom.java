@@ -747,7 +747,7 @@ public class MainAdom {
 		putInFileSingleCritere("kroA","HeuristicFromFirstCity", 1, heuristicFromFirstCity);
 		System.out.println("========================================================================");
 */
-		
+		/*
 		ArrayList<Integer> resultatDistances = new ArrayList<Integer>();
 		ArrayList<ArrayList<Integer>> resultatListCities = new ArrayList<ArrayList<Integer>>();
 
@@ -761,38 +761,40 @@ public class MainAdom {
 		putInCSVFileDistance("kroA","Voisinage/Swap", resultatDistances);
 		putInCSVFileListCities("kroA","Voisinage/Swap", resultatListCities);
 		
-
+*//*
 		System.out.println("========================================================================");
-/*
 
-		for (int i = 1; i < 16; i++) {
-			ArrayList<Integer> voisinageTwoOptBetweenFirstAndSecondCity = voisinage(initialisation(matrixInHashMap, "mouvement", "heuristic", 0), 0, i,"two-opt");
-			System.out.println("Two-opt entre la 1ère ville et la "+(i+1)+"ème : " + evaluateDistances(voisinageTwoOptBetweenFirstAndSecondCity,matrixInHashMap));
+		ArrayList<Integer> resultatDistances = new ArrayList<Integer>();
+		ArrayList<ArrayList<Integer>> resultatListCities = new ArrayList<ArrayList<Integer>>();
+		for (int i = 1; i < 31; i++) {
+			ArrayList<Integer> voisinageTwoOptBetweenFirstAndSecondCity = voisinage(initialisation(matrixInHashMapB, "mouvement", "heuristic", 0), 0, i,"two-opt");
+			System.out.println("Two-opt entre la 1ère ville et la "+(i+1)+"ème : " + evaluateDistances(voisinageTwoOptBetweenFirstAndSecondCity,matrixInHashMapB));
 			System.out.println(voisinageTwoOptBetweenFirstAndSecondCity);
 
-			putInFileSingleCritere("kroA","Voisinage/Two-opt", i, voisinageTwoOptBetweenFirstAndSecondCity);
-			if(i!=15) {
-				System.out.println("------------------------------------------------------------------------");
-			}
+			resultatDistances.add(evaluateDistances(voisinageTwoOptBetweenFirstAndSecondCity,matrixInHashMapB));
+			resultatListCities.add(voisinageTwoOptBetweenFirstAndSecondCity);
 		}
+		putInCSVFileDistance("kroB","Voisinage/Two-opt", resultatDistances);
+		putInCSVFileListCities("kroB","Voisinage/Two-opt", resultatListCities);
 
 		System.out.println("========================================================================");
-		 */
-
-		/*
+		 
+*/
+		ArrayList<Integer> resultatDistances = new ArrayList<Integer>();
 		for (int j = 0; j < 30; j++) {
-			ArrayList<Integer> heuristic = initialisation(matrixInHashMap, "mouvement", "heuristic", j);
-			System.out.println("Solution à partir de la "+j+"ème ville: " + evaluateDistances(heuristic,matrixInHashMap));
+			ArrayList<Integer> heuristic = initialisation(matrixInHashMapB, "mouvement", "heuristic", j);
+			System.out.println("Solution à partir de la "+j+"ème ville: " + evaluateDistances(heuristic,matrixInHashMapB));
 			System.out.println(heuristic);
-			putInFileSingleCritere("kroA","Heuristic", j, heuristic);
+			resultatDistances.add(evaluateDistances(heuristic,matrixInHashMapB));
+			//putInFileSingleCritere("kroA","Heuristic", j, heuristic);
 			System.out.println("========================================================================");
 		}
+		putInCSVFileDistance("kroB","Heuristic", resultatDistances);
 
-
-		System.out.println("Best heuristic : " + bestHeuristic(matrixInHashMap));
+		System.out.println("Best heuristic : " + bestHeuristic(matrixInHashMapB));
 
 		System.out.println("========================================================================");
-		 */
+		 
 		/*
 		ArrayList<Integer> random = new ArrayList<Integer>();
 		for (int i = 1; i < 31; i++) {
