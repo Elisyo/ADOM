@@ -156,6 +156,42 @@ public class MainAdom {
 
 		}
 	}
+	
+	/**
+	 * Fonction permettant de stocker nos résultats, elle sera uniquement utilisée pour la partie "Online pareto"
+	 * @param originFile
+	 * @param name
+	 * @param num
+	 * @param city
+	 */
+	private static void putInCSVFileOnlinePareto (ArrayList<MultiData> randomPopulation, ArrayList<MultiData> resultatOnline){
+		try{
+			String path=new File("").getAbsolutePath();
+			File ff=new File(path+"/resources/Pareto/worldPopulation.csv"); // définir l'arborescence
+			ff.createNewFile();
+			FileWriter ffw=new FileWriter(ff);
+			for (int i = 0; i < randomPopulation.size(); i++) {
+				ffw.write(randomPopulation.get(i).getCostA()+" "+randomPopulation.get(i).getCostB());  // écrire une ligne dans le fichier worldPopulation.csv
+				if(i!=randomPopulation.size()-1) {
+					ffw.write("\n"); // retour à la ligne
+				}
+			}
+			ffw.close(); // fermer le fichier à la fin des traitements
+
+			ff=new File(path+"/resources/Pareto/non_domines.csv"); // définir l'arborescence
+			ff.createNewFile();
+			ffw=new FileWriter(ff);
+			for (int i = 0; i < resultatOnline.size(); i++) {
+				ffw.write(resultatOnline.get(i).getCostA()+" "+resultatOnline.get(i).getCostB());  // écrire une ligne dans le fichier non_domines.csv
+				if(i!=resultatOnline.size()-1) {
+					ffw.write("\n"); // retour à la ligne
+				}
+			}
+			ffw.close(); // fermer le fichier à la fin des traitements
+		} catch (Exception e) {
+
+		}
+	}
 
 	/**
 	 * Génération de la matrice par une HashMap : (ville, [distance entre cette ville et les autres])
@@ -808,7 +844,7 @@ public class MainAdom {
 		*/
 
 		
-		
+		/*
 		for (int j = 1; j < 11; j++) {
 			ArrayList<Integer> mutationDistances = new ArrayList<Integer>();
 			ArrayList<Integer> random2 = initialisation(matrixInHashMap, "random","", 0);
@@ -831,7 +867,7 @@ public class MainAdom {
 			putInCSVFileDistance("kroA_"+j,"Mutation", mutationDistances);
 		}
 		
-
+*/
 		System.out.println("========================================================================");
 		 
 
@@ -1020,11 +1056,12 @@ public class MainAdom {
 		System.out.println("offline");
 		filterNonDominated(randomPopulation, "offline");
 		System.out.println("online");
-		filterNonDominated(randomPopulation, "online");
+		ArrayList<MultiData> resultatOnline = filterNonDominated(randomPopulation, "online");
+		putInCSVFileOnlinePareto(randomPopulation, resultatOnline);
 	}
 
 	public static void main(String [] args) {
-		singleCritere();
-		//multiCritere();
+		//singleCritere();
+		multiCritere();
 	}
 }
