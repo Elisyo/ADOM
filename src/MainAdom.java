@@ -779,7 +779,7 @@ public class MainAdom {
 
 		System.out.println("========================================================================");
 		 
-*/
+*//*
 		ArrayList<Integer> resultatDistances = new ArrayList<Integer>();
 		for (int j = 0; j < 30; j++) {
 			ArrayList<Integer> heuristic = initialisation(matrixInHashMapB, "mouvement", "heuristic", j);
@@ -794,7 +794,7 @@ public class MainAdom {
 		System.out.println("Best heuristic : " + bestHeuristic(matrixInHashMapB));
 
 		System.out.println("========================================================================");
-		 
+		*/
 		/*
 		ArrayList<Integer> random = new ArrayList<Integer>();
 		for (int i = 1; i < 31; i++) {
@@ -807,28 +807,33 @@ public class MainAdom {
 		System.out.println("========================================================================");
 		*/
 
-		/*
-		for (int j = 1; j < 31; j++) {
+		
+		
+		for (int j = 1; j < 11; j++) {
+			ArrayList<Integer> mutationDistances = new ArrayList<Integer>();
 			ArrayList<Integer> random2 = initialisation(matrixInHashMap, "random","", 0);
 			ArrayList<Integer> random2Tmp = new ArrayList<Integer>();
 			for (int i = 0; i < random2.size(); i++) {
 				random2Tmp.add(random2.get(i));
 			}
-			putInFileSingleCritere("kroA","Mutation", j, random2);
+			mutationDistances.add(evaluateDistances(random2, matrixInHashMap));
 			System.out.println("Random list 2 : " + evaluateDistances(random2, matrixInHashMap));
 			System.out.println(random2);
 			random2 = mutation(random2, 10);
-			putInFileSingleCritere("kroA","Mutation/10", j, random2);
+			mutationDistances.add(evaluateDistances(random2, matrixInHashMap));
 			System.out.println("Random list 2  (après la mutation, 10%): " + evaluateDistances(random2, matrixInHashMap));
 			System.out.println(random2);
 			random2Tmp = mutation(random2Tmp, 30);
-			putInFileSingleCritere("kroA","Mutation/30", j, random2Tmp);
+			mutationDistances.add(evaluateDistances(random2Tmp, matrixInHashMap));
 			System.out.println("Random list 2  (après la mutation, 30%): " + evaluateDistances(random2Tmp, matrixInHashMap));
 			System.out.println(random2Tmp);
+			System.out.println(mutationDistances);
+			putInCSVFileDistance("kroA_"+j,"Mutation", mutationDistances);
 		}
+		
 
 		System.out.println("========================================================================");
-		 */
+		 
 
 		
 		ArrayList<Integer> semiHeuristicFromFirstCity = initialisation(matrixInHashMap, "mouvement", "semi-heuristic", 0);
