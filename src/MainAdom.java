@@ -1103,7 +1103,7 @@ public class MainAdom {
 			System.out.println("Que voulez-vous faire ?");
 			System.out.println("1. SingleCritere");
 			System.out.println("2. MultiCritere");
-			System.out.println("3. Sorite du programme");
+			System.out.println("3. Sortie du programme");
 			System.out.println("Merci d'indiquer le numéro correspondant.");
 			String str = sc.nextLine();
 			switch (str) {
