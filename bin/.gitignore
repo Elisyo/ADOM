@@ -20,3 +20,15 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+/.classpath
+/.gitignore
+/.project
+/.settings/
+/README.md
+/kroA100.tsp
+/kroB100.tsp
+/kroC100.tsp
+/kroD100.tsp
+/kroE100.tsp
+/resources/
+/src/
